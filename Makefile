@@ -1,12 +1,15 @@
+FIRMWARE=sparkcopter.bin
+SPARK_NAME=shark
+
 .PHONY: clean
 
-all: firmware.bin
+all: $(FIRMWARE)
 
-firmware.bin:
-	spark compile . --saveTo firmware.bin
+$(FIRMWARE):
+	spark compile . --saveTo $(FIRMWARE)
 
-install: firmware.bin
-	spark flash shark firmware.bin
+install: $(FIRMWARE)
+	spark flash $(SPARK_NAME) $(FIRMWARE)
 
 clean:
 	rm *.bin
