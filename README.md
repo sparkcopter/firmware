@@ -7,8 +7,8 @@ Spark Core Quadcopter
 Hardware
 --------
 
--   Spark core
--   MPU-6050 accelerometer/gyroscope (GY-521)
+-   [Spark core](http://spark.io/firmware)
+-   [MPU-6050 accelerometer/gyroscope](http://playground.arduino.cc/Main/MPU-6050)
 -   Hubsan x4 motors
 -   Hubsan x4 propellers
 -   3.7v LIPO battery
