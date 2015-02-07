@@ -1,8 +1,12 @@
-[WIP] Firmware for from-scratch quadcopter
-==========================================
+Spark Core Quadcopter
+=====================
 
-Components
-----------
+[WIP] Firmware and designs for a from-scratch [Spark Core](http://spark.io) based quadcopter.
+
+
+Hardware
+--------
+
 -   Spark core
 -   MPU-6050 accelerometer/gyroscope (GY-521)
 -   Hubsan x4 motors
@@ -10,8 +14,10 @@ Components
 -   3.7v LIPO battery
 -   3d-printed frame
 
-Code modules
-------------
+
+Firmware
+--------
+
 -   Sensor reading: Read values from gyroscope and accelerometer
 -   Control inputs: Read simple commands from the network
 -   Motor control: Adjust motor speeds based on sensor values and control inputs
