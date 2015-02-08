@@ -24,6 +24,13 @@ void loop() {
     // Accelerometer data
     //
 
+    // Positive X = "Tilting left"
+    // Negative X = "Tilting right"
+    // Positive Y = "Tilting backward"
+    // Negative Y = "Tilting forward"
+    // Positive Z = "Tilting up"
+    // Negative Z = "Tilting down"
+
     Serial.print("Accelerometer: ");
     Serial.print("x=");
     Serial.print(accelX);
@@ -33,16 +40,17 @@ void loop() {
     Serial.print(accelZ);
     Serial.println();
 
-    // Negative X = "Tilting right"
-    // Positive X = "Tilting left"
-    // Negative Y = "Tilting forward"
-    // Positive Y = "Tilting backward"
-    // Positive Z = "Facing up"
-    // Negative Z = "Facing down"
 
     //
     // Gyroscope data
     //
+
+    // Negative X = "Moving up"
+    // Positive X = "Moving down"
+    // Negative Y = "Moving left"
+    // Positive Y = "Moving right"
+    // Positive Z = "Facing up"
+    // Negative Z = "Facing down"
 
     Serial.print("Gyroscope: ");
     Serial.print("x=");
