@@ -12,4 +12,4 @@ install: $(FIRMWARE)
 	spark flash $(SPARK_NAME) $(FIRMWARE)
 
 clean:
-	rm *.bin
+	rm -f *.bin

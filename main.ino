@@ -1,55 +1,58 @@
-char ipString[24];
+#include "MPU6050.h"
 
-TCPServer server = TCPServer(23);
-TCPClient client;
+// Sensor inputs
+MPU6050 *sensors = new MPU6050();
 
 void setup() {
-    publishIpAddress();
+    // Setup USB serial output
+    Serial.begin(9600);
 
-    server.begin();
+    // Initialize sensors
+    sensors->init();
+
+    // Prints out the local IP over Serial.
+    Serial.println(WiFi.localIP());
 }
 
 void loop() {
-    // TODO: Read sensors
-    // TODO: Read input
-    // TODO: Adjust motors
+    int16_t accelX, accelY, accelZ;
+    int16_t gyroX, gyroY, gyroZ;
 
-    if (client.connected()) {
-        // echo all available bytes back to the client
-        while (client.available()) {
-            char input = client.read();
-            switch(input) {
-                case 'w':
-                    server.write("Forward");
-                    break;
-                case 'a':
-                    server.write("Left");
-                    break;
-                case 's':
-                    server.write("Right");
-                    break;
-                case 'd':
-                    server.write("Backward");
-                    break;
-                case 'q':
-                    server.write("Disconnect");
-                    client.stop();
-                default:
-                    break;
-            }
+    sensors->getMotion(&accelX, &accelY, &accelZ, &gyroX, &gyroY, &gyroZ);
 
-            /*delay(100);*/
-        }
-    } else {
-        // if no client is yet connected, check for a new connection
-        client = server.available();
-    }
-}
+    //
+    // Accelerometer data
+    //
 
-// Make local IP address available via web api at
-// https://api.spark.io/v1/devices/<device_id>/ipAddress\?access_token\=<access_token>
-void publishIpAddress() {
-    IPAddress myIp = WiFi.localIP();
-    sprintf(ipString, "%d.%d.%d.%d", myIp[0], myIp[1], myIp[2], myIp[3]);
-    Spark.variable("ipAddress", ipString, STRING);
+    Serial.print("Accelerometer: ");
+    Serial.print("x=");
+    Serial.print(accelX);
+    Serial.print(" y=");
+    Serial.print(accelY);
+    Serial.print(" z=");
+    Serial.print(accelZ);
+    Serial.println();
+
+    // Negative X = "Tilting right"
+    // Positive X = "Tilting left"
+    // Negative Y = "Tilting forward"
+    // Positive Y = "Tilting backward"
+    // Positive Z = "Facing up"
+    // Negative Z = "Facing down"
+
+    //
+    // Gyroscope data
+    //
+
+    Serial.print("Gyroscope: ");
+    Serial.print("x=");
+    Serial.print(gyroX);
+    Serial.print(" y=");
+    Serial.print(gyroY);
+    Serial.print(" z=");
+    Serial.print(gyroZ);
+    Serial.println();
+
+
+    delay(100);
 }
