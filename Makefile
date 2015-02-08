@@ -6,7 +6,7 @@ SPARK_NAME=shark
 all: $(FIRMWARE)
 
 $(FIRMWARE):
-	spark compile . --saveTo $(FIRMWARE)
+	spark compile src --saveTo $(FIRMWARE)
 
 install: $(FIRMWARE)
 	spark flash $(SPARK_NAME) $(FIRMWARE)
