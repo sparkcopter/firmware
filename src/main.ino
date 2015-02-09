@@ -1,7 +1,14 @@
 #include "MPU6050.h"
+#include "Motor.h"
 
 // Sensor inputs
 MPU6050 *sensors = new MPU6050();
+
+// Motors
+Motor *motorFrontLeft = new Motor(A5);
+Motor *motorFrontRight = new Motor(A4);
+Motor *motorBackLeft = new Motor(A0);
+Motor *motorBackRight = new Motor(A1);
 
 void setup() {
     // Setup USB serial output
