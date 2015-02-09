@@ -1,4 +1,4 @@
-#include <stdint.h>
+#include "stdint.h"
 #include "application.h"
 
 #define MPU6050_DEFAULT_ADDRESS  0x68

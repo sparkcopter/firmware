@@ -74,10 +74,10 @@ void MPU6050::readBytes(uint8_t regAddr, uint8_t length, uint8_t *data) {
     Wire.beginTransmission(this->address);
     Wire.write(regAddr);
     Wire.endTransmission(false);
-    Wire.requestFrom(this->address, length, true);
+    Wire.requestFrom(this->address, length);
 
     // Read requested registers into a buffer
-    for(int8_t i = 0; i < Wire.available(); i++) {
+    for(int8_t i = 0; i < length; i++) {
         data[i] = Wire.read();
     }
 }
