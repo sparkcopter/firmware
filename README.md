@@ -12,7 +12,7 @@ Contents
     -   [MPU-6050 Sensor](#mpu6050-sensor)
     -   [Hubsan X4 Motors](#hubsan-x4-motors)
     -   [3.7v LIPO Battery](#37v-lipo-battery)
-    -   [3D Printed Frame](#3d-printed-frame)
+    -   [Other Components](#other-components)
 -   [Schematics](#schematics)
     -   [Breadboard Layout](#breadboard-layout)
     -   [Circuit Diagram](#circuit-diagram)
@@ -65,9 +65,10 @@ Lightweight LIPO battery to power both the Spark Core and DC motors.
 -   [Purchase on Amazon](http://www.amazon.com/gp/product/B00HS5Y6G4/)
 
 
-### 3D Printed Frame
+### Other Components
 
--   TODO
+-   [2N2222 Transistors](http://en.wikipedia.org/wiki/2N2222) - Used to switch low-current motor control signals from the Spark core into higher current signals suitable for driving the motors.
+-   [1N4004 Diodes](http://en.wikipedia.org/wiki/1N4001_and_1N5400_series_diodes) - Used as [flyback diodes](http://en.wikipedia.org/wiki/Flyback_diode) to protect the transistors from back voltage generated when the motor shuts off, or if the motor is turned in the reverse direction.
 
 
 Schematics
