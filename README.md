@@ -51,7 +51,7 @@ Small, lightweight 3.7v DC motors to provide lift and control. These motors are 
 -   [Purchase motors on Amazon](http://www.amazon.com/Hubsan-Mini-Quadcopter-Spare-Motor/dp/B00B3RO0GE)
 -   [Purchase propellers on Amazon](http://www.amazon.com/gp/product/B00GZHI75C)
 -   [Specifications & Performance Data](http://www.rcgroups.com/forums/showthread.php?t=2009496)
--   [Motor control guide](ttps://itp.nyu.edu/physcomp/labs/motors-and-transistors/using-a-transistor-to-control-high-current-loads-with-an-arduino)
+-   [Motor control guide](https://itp.nyu.edu/physcomp/labs/motors-and-transistors/using-a-transistor-to-control-high-current-loads-with-an-arduino)
 -   [Spark Core `analogWrite` docs](http://docs.spark.io/firmware/#i-o-analogwrite)
 -   Variants
     -   Clockwise - Red + / Blue -
