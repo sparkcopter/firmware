@@ -1,14 +1,25 @@
 #include "MPU6050.h"
 #include "Motor.h"
+#include "UserInput.h"
+
+// Constants
+#define USER_INPUT_TCP_PORT     23
+#define MOTOR_PIN_FRONT_LEFT    A5
+#define MOTOR_PIN_FRONT_RIGHT   A4
+#define MOTOR_PIN_BACK_LEFT     A0
+#define MOTOR_PIN_BACK_RIGHT    A1
 
 // Sensor inputs
 MPU6050 *sensors = new MPU6050();
 
 // Motors
-Motor *motorFrontLeft = new Motor(A5);
-Motor *motorFrontRight = new Motor(A4);
-Motor *motorBackLeft = new Motor(A0);
-Motor *motorBackRight = new Motor(A1);
+Motor *motorFrontLeft = new Motor(MOTOR_PIN_FRONT_LEFT);
+Motor *motorFrontRight = new Motor(MOTOR_PIN_FRONT_RIGHT);
+Motor *motorBackLeft = new Motor(MOTOR_PIN_BACK_LEFT);
+Motor *motorBackRight = new Motor(MOTOR_PIN_BACK_RIGHT);
+
+// User input
+UserInput *userInput = new UserInput(USER_INPUT_TCP_PORT);
 
 void setup() {
     // Setup USB serial output
