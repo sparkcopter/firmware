@@ -28,8 +28,8 @@ Components
 
 The brains of the quadcopter, reads user input over wi-fi and sensor input from the MPU-6050, and adjusts motors accordingly. A Spark Photon should also work in place of a Spark Core.
 
--   [Website](http://spark.io)
--   [Documentation](http://spark.io/firmware)
+-   [Spark Core Website](http://spark.io)
+-   [Firware Documentation](http://spark.io/firmware)
 
 
 ### MPU-6050 Sensor
@@ -48,8 +48,8 @@ The MPU-6050 is a 6-axis motion sensing chip, which contains both an acceleromet
 
 Small, lightweight 3.7v DC motors to provide lift and control. These motors are easy to find since they are used in the Hubsan X4 quadcopter. Inexpensive plastic propellers are available which attach directly to the motors.
 
--   [Purchase motors on Amazon](http://www.amazon.com/Hubsan-Mini-Quadcopter-Spare-Motor/dp/B00B3RO0GE)
--   [Purchase propellers on Amazon](http://www.amazon.com/gp/product/B00GZHI75C)
+-   [Buy motors on Amazon](http://www.amazon.com/Hubsan-Mini-Quadcopter-Spare-Motor/dp/B00B3RO0GE)
+-   [Buy propellers on Amazon](http://www.amazon.com/gp/product/B00GZHI75C)
 -   [Specifications & Performance Data](http://www.rcgroups.com/forums/showthread.php?t=2009496)
 -   [Motor control guide](https://itp.nyu.edu/physcomp/labs/motors-and-transistors/using-a-transistor-to-control-high-current-loads-with-an-arduino)
 -   [Spark Core `analogWrite` docs](http://docs.spark.io/firmware/#i-o-analogwrite)
@@ -62,7 +62,7 @@ Small, lightweight 3.7v DC motors to provide lift and control. These motors are 
 
 Lightweight LIPO battery to power both the Spark Core and DC motors.
 
--   [Purchase on Amazon](http://www.amazon.com/gp/product/B00HS5Y6G4/)
+-   [Buy batteries on Amazon](http://www.amazon.com/gp/product/B00HS5Y6G4/)
 
 
 ### Other Components
