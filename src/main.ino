@@ -28,6 +28,12 @@ void setup() {
     // Initialize sensors
     sensors->init();
 
+    // Spin up all motors for testing
+    motorFrontLeft->setSpeed(255);
+    motorFrontRight->setSpeed(255);
+    motorBackLeft->setSpeed(255);
+    motorBackRight->setSpeed(255);
+
     // Prints out the local IP over Serial.
     Serial.println(WiFi.localIP());
 }
