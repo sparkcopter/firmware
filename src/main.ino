@@ -1,9 +1,10 @@
+#include "Logger.h"
 #include "MPU6050.h"
 #include "Motor.h"
 #include "UserInput.h"
 
 // Constants
-#define USER_INPUT_TCP_PORT     23
+#define USER_INPUT_UDP_PORT     5556
 #define MOTOR_PIN_FRONT_LEFT    A5
 #define MOTOR_PIN_FRONT_RIGHT   A4
 #define MOTOR_PIN_BACK_LEFT     A0
@@ -19,13 +20,12 @@ Motor *motorBackLeft = new Motor(MOTOR_PIN_BACK_LEFT);
 Motor *motorBackRight = new Motor(MOTOR_PIN_BACK_RIGHT);
 
 // User input
-UserInput *userInput = new UserInput(USER_INPUT_TCP_PORT);
+UserInput *userInput = new UserInput(USER_INPUT_UDP_PORT);
 
 void setup() {
-    // Setup USB serial output
-    Serial.begin(9600);
+    Logger::init();
 
-    // Initialize sensors
+    userInput->init();
     sensors->init();
 
     // Spin up all motors for testing
@@ -33,58 +33,23 @@ void setup() {
     motorFrontRight->setSpeed(255);
     motorBackLeft->setSpeed(255);
     motorBackRight->setSpeed(255);
-
-    // Prints out the local IP over Serial.
-    Serial.println(WiFi.localIP());
 }
 
 void loop() {
     int16_t accelX, accelY, accelZ;
     int16_t gyroX, gyroY, gyroZ;
 
+    // Get the spark's IP address
+    /*IPAddress myIp = WiFi.localIP();*/
+    /*Logger::log("IP: %d.%d.%d.%d", myIp[0], myIp[1], myIp[2], myIp[3]);*/
+
+    // Read control input
+    userInput->read();
+
+    // Read sensors
     sensors->getMotion(&accelX, &accelY, &accelZ, &gyroX, &gyroY, &gyroZ);
+    /*Logger::log("Accel: x=%d y=%d z=%d", accelX, accelY, accelZ);*/
+    /*Logger::log("Gyro: x=%d y=%d z=%d", gyroX, gyroY, gyroZ);*/
 
-    //
-    // Accelerometer data
-    //
-
-    // Positive X = "Tilting left"
-    // Negative X = "Tilting right"
-    // Positive Y = "Tilting backward"
-    // Negative Y = "Tilting forward"
-    // Positive Z = "Tilting up"
-    // Negative Z = "Tilting down"
-
-    Serial.print("Accelerometer: ");
-    Serial.print("x=");
-    Serial.print(accelX);
-    Serial.print(" y=");
-    Serial.print(accelY);
-    Serial.print(" z=");
-    Serial.print(accelZ);
-    Serial.println();
-
-
-    //
-    // Gyroscope data
-    //
-
-    // Negative X = "Moving up"
-    // Positive X = "Moving down"
-    // Negative Y = "Moving left"
-    // Positive Y = "Moving right"
-    // Positive Z = "Facing up"
-    // Negative Z = "Facing down"
-
-    Serial.print("Gyroscope: ");
-    Serial.print("x=");
-    Serial.print(gyroX);
-    Serial.print(" y=");
-    Serial.print(gyroY);
-    Serial.print(" z=");
-    Serial.print(gyroZ);
-    Serial.println();
-
-
-    delay(100);
+    delay(10);
 }
