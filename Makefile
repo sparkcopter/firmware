@@ -11,5 +11,8 @@ $(FIRMWARE):
 install: $(FIRMWARE)
 	spark flash $(SPARK_NAME) $(FIRMWARE)
 
+install-usb: $(FIRMWARE)
+	spark flash --usb $(FIRMWARE)
+
 clean:
 	rm -f *.bin
