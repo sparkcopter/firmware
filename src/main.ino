@@ -22,10 +22,34 @@ Motor *motorBackRight = new Motor(MOTOR_PIN_BACK_RIGHT);
 // User input
 UserInput *userInput = new UserInput(USER_INPUT_UDP_PORT);
 
+// Control callbacks
+void takeoff() {
+    RGB.color(0, 255, 0);
+}
+
+void land() {
+    RGB.color(255, 0, 0);
+}
+
+void move(float leftTilt, float frontTilt, float verticalSpeed, float angularSpeed) {
+    /*Logger::log("Move: %f, %f, %f, %f", leftTilt, frontTilt, verticalSpeed, angularSpeed);*/
+}
+
 void setup() {
+    // Enable serial logging
     Logger::init();
 
+    // Set up spark LED
+    RGB.control(true);
+    RGB.color(255, 0, 0);
+
+    // Initialize user input and attach callbacks
     userInput->init();
+    userInput->takeoff = &takeoff;
+    userInput->land = &land;
+    userInput->move = &move;
+
+    // Initialize sensors
     sensors->init();
 
     // Spin up all motors for testing

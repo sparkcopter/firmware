@@ -1,6 +1,11 @@
 #include "Logger.h"
 #include "UserInput.h"
 
+typedef union _float_or_int_t {
+    float f;
+    int   i;
+} float_or_int_t;
+
 UserInput::UserInput(int port) {
     this->port = port;
 }
@@ -11,10 +16,6 @@ void UserInput::init() {
 
     // Open UDP port
     udp->begin(port);
-
-    // Turn on RED LED
-    RGB.control(true);
-    RGB.color(255, 0, 0);
 }
 
 void UserInput::read() {
@@ -32,28 +33,21 @@ void UserInput::read() {
         while(command)  {
             // Parse AT command
             if(strncmp("AT*", command, 3) == 0) {
-                Serial.print("Valid AT* command: ");
-                Serial.println(command);
-
                 char *commandStart = command + 3;
                 if(strncmp("REF=", commandStart, 4) == 0) {
-                    // Parse arguments
-                    char *argTokens;
-                    int sequenceNumber = atoi(strtok_r(command+7, ",", &argTokens));
-                    int controlField = atoi(strtok_r(NULL, ",", &argTokens));
-
-                    // Extract REF commands
-                    int takeoff = (controlField >> 9) & 1;
-                    int emergency = (controlField >> 8) & 1;
-
-                    // Do something (temporary)
-                    if(takeoff) {
-                        RGB.color(0, 255, 0);
-                    } else {
-                        RGB.color(255, 0, 0);
-                    }
+                    handleRef(commandStart + 4);
                 } else if(strncmp("PCMD=", commandStart, 5) == 0) {
-                    // TODO
+                    handlePcmd(commandStart + 5);
+                } else if(strncmp("FTRIM=", commandStart, 6) == 0) {
+                    handleFtrim();
+                } else if(strncmp("CONFIG=", commandStart, 7) == 0) {
+                    handlePcmd(commandStart + 7);
+                } else if(strncmp("LED=", commandStart, 4) == 0) {
+                    handlePcmd(commandStart + 4);
+                } else if(strncmp("ANIM=", commandStart, 5) == 0) {
+                    handlePcmd(commandStart + 5);
+                } else {
+                    Logger::log("Received unknown AT command: %s", commandStart);
                 }
             }
 
@@ -65,6 +59,72 @@ void UserInput::read() {
     }
 }
 
-// void setCallback(char *command, void *function) {}
-// setCallback("takeoff", &takeoff);
-// setCallback("progress", &progress)
+bool UserInput::validSequenceNumber(int sequenceNumber) {
+    // TODO: Actually verify
+    return true;
+}
+
+// AT*REF commands (Takeoff/Landing/Emergency stop command)
+void UserInput::handleRef(char *args) {
+    // Parse arguments
+    char *argTokens;
+
+    // Extract UDP sequence number
+    int sequenceNumber = atoi(strtok_r(args, ",", &argTokens));
+    if(!validSequenceNumber(sequenceNumber)) {
+        return;
+    }
+
+    // Extract REF commands
+    int controlField = atoi(strtok_r(NULL, ",", &argTokens));
+    int takeoffBit = (controlField >> 9) & 1;
+    int emergencyBit = (controlField >> 8) & 1;
+
+    // Run callback
+    takeoffBit ? takeoff() : land();
+}
+
+// AT*PCMD commands (Move the drone)
+void UserInput::handlePcmd(char *args) {
+    // Parse arguments
+    char *argTokens;
+
+    // Extract UDP sequence number
+    int sequenceNumber = atoi(strtok_r(args, ",", &argTokens));
+    if(!validSequenceNumber(sequenceNumber)) {
+        return;
+    }
+
+    // Extract movement mode (currently unused)
+    int progressive = (int)atoi(strtok_r(NULL, ",", &argTokens));
+
+    // Extract movement commands (floats stored as ints)
+    float_or_int_t leftTilt, frontTilt, verticalSpeed, angularSpeed;
+    leftTilt.i = atoi(strtok_r(NULL, ",", &argTokens));
+    frontTilt.i = atoi(strtok_r(NULL, ",", &argTokens));
+    verticalSpeed.i = atoi(strtok_r(NULL, ",", &argTokens));
+    angularSpeed.i = atoi(strtok_r(NULL, ",", &argTokens));
+
+    // Run callback
+    move(leftTilt.f, frontTilt.f, verticalSpeed.f, angularSpeed.f);
+}
+
+// AT*FTRIM commands (Sets the reference for the horizontal plane)
+void UserInput::handleFtrim() {
+    // TODO
+}
+
+// AT*CONFIG commands (Sets config variables)
+void UserInput::handleConfig(char *args) {
+    // TODO
+}
+
+// AT*LED (Set a led animation)
+void UserInput::handleLed(char *args) {
+    // TODO
+}
+
+// AT*ANIM (Set a flight animation)
+void UserInput::handleAnim(char *args) {
+    // TODO
+}
