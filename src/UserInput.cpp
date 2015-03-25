@@ -41,11 +41,11 @@ void UserInput::read() {
                 } else if(strncmp("FTRIM=", commandStart, 6) == 0) {
                     handleFtrim();
                 } else if(strncmp("CONFIG=", commandStart, 7) == 0) {
-                    handlePcmd(commandStart + 7);
+                    handleConfig(commandStart + 7);
                 } else if(strncmp("LED=", commandStart, 4) == 0) {
-                    handlePcmd(commandStart + 4);
+                    handleLed(commandStart + 4);
                 } else if(strncmp("ANIM=", commandStart, 5) == 0) {
-                    handlePcmd(commandStart + 5);
+                    handleAnim(commandStart + 5);
                 } else {
                     Logger::log("Received unknown AT command: %s", commandStart);
                 }
