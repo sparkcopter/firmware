@@ -11,10 +11,6 @@ UserInput::UserInput(int port) {
 }
 
 void UserInput::init() {
-    // Wait for WiFi to connect
-    while (!WiFi.ready()) {}
-
-    // Open UDP port
     udp->begin(port);
 }
 
