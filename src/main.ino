@@ -60,9 +60,6 @@ void setup() {
 }
 
 void loop() {
-    int16_t accelX, accelY, accelZ;
-    int16_t gyroX, gyroY, gyroZ;
-
     // Get the spark's IP address
     /*IPAddress myIp = WiFi.localIP();*/
     /*Logger::log("IP: %d.%d.%d.%d", myIp[0], myIp[1], myIp[2], myIp[3]);*/
@@ -71,9 +68,11 @@ void loop() {
     userInput->read();
 
     // Read sensors
+    float accelX, accelY, accelZ, gyroX, gyroY, gyroZ;
     sensors->getMotion(&accelX, &accelY, &accelZ, &gyroX, &gyroY, &gyroZ);
-    /*Logger::log("Accel: x=%d y=%d z=%d", accelX, accelY, accelZ);*/
-    /*Logger::log("Gyro: x=%d y=%d z=%d", gyroX, gyroY, gyroZ);*/
+    /*Logger::log("Accel: x=%f y=%f z=%f", accelX, accelY, accelZ);*/
+    /*Logger::log("Gyro: x=%f y=%f z=%f", gyroX, gyroY, gyroZ);*/
+
 
     delay(10);
 }
