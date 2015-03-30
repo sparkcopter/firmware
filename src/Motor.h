@@ -1,4 +1,6 @@
-#include "application.h"
+#pragma once
+
+#include <spark_wiring.h>
 
 class Motor {
 public:
