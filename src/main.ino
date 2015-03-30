@@ -1,5 +1,5 @@
 #include "Logger.h"
-#include "MPU6050.h"
+#include "IMU.h"
 #include "Motor.h"
 #include "UserInput.h"
 
@@ -11,16 +11,16 @@
 #define MOTOR_PIN_BACK_RIGHT    A1
 
 // Sensor inputs
-MPU6050 accelgyro;
+IMU imu;
 
 // Motors
-Motor *motorFrontLeft = new Motor(MOTOR_PIN_FRONT_LEFT);
-Motor *motorFrontRight = new Motor(MOTOR_PIN_FRONT_RIGHT);
-Motor *motorBackLeft = new Motor(MOTOR_PIN_BACK_LEFT);
-Motor *motorBackRight = new Motor(MOTOR_PIN_BACK_RIGHT);
+Motor motorFrontLeft = Motor(MOTOR_PIN_FRONT_LEFT);
+Motor motorFrontRight = Motor(MOTOR_PIN_FRONT_RIGHT);
+Motor motorBackLeft = Motor(MOTOR_PIN_BACK_LEFT);
+Motor motorBackRight = Motor(MOTOR_PIN_BACK_RIGHT);
 
 // User input
-UserInput *userInput = new UserInput(USER_INPUT_UDP_PORT);
+UserInput userInput = UserInput(USER_INPUT_UDP_PORT);
 
 unsigned long printTimer = millis();
 unsigned long lastTrim = 0;
@@ -59,9 +59,8 @@ void pcmd(bool progressive, bool combinedYaw, float leftTilt, float frontTilt, f
 void ftrim() {
     unsigned long now = millis();
     if(lastTrim == 0 || now > lastTrim + 5000) {
-        /*sensors->calibrate();*/
-
-        RGB.color(255, 255, 0); // Yellow LED - landed calibrated
+        imu.calibrate();
+        RGB.color(255, 255, 0);
         lastTrim = now;
     }
 }
@@ -78,19 +77,19 @@ void setup() {
     RGB.color(255, 0, 0); // Red LED - landed and not calibrated
 
     // Initialize user input and attach callbacks
-    userInput->init();
-    userInput->ref = &ref;
-    userInput->pcmd = &pcmd;
-    userInput->ftrim = &ftrim;
+    userInput.init();
+    userInput.ref = &ref;
+    userInput.pcmd = &pcmd;
+    userInput.ftrim = &ftrim;
 
     // Initialize sensors
-    accelgyro.initialize();
+    imu.initialize();
 
     // Spin up all motors for testing
-    motorFrontLeft->setSpeed(255);
-    motorFrontRight->setSpeed(255);
-    motorBackLeft->setSpeed(255);
-    motorBackRight->setSpeed(255);
+    motorFrontLeft.setSpeed(255);
+    motorFrontRight.setSpeed(255);
+    motorBackLeft.setSpeed(255);
+    motorBackRight.setSpeed(255);
 }
 
 void loop() {
@@ -102,12 +101,11 @@ void loop() {
     }
 
     // Read control input
-    userInput->read();
+    userInput.read();
 
     // Read sensors
-    int16_t ax, ay, az, gx, gy, gz;
-    accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-    Logger::debug("Accel: x=%6d y=%6d z=%6d\tGyro: x=%6d y=%6d z=%6d", ax, ay, az, gx, gy, gz);
+    float yaw, pitch, roll;
+    imu.getYawPitchRoll(&yaw, &pitch, &roll);
 
     delay(10);
 }

@@ -1,6 +1,14 @@
 #include "IMU.h"
 #include "Logger.h"
 
+IMU::IMU() {
+
+}
+
+void IMU::initialize() {
+    accelgyro.initialize();
+}
+
 void IMU::calibrate() {
     uint16_t accelsensitivity = 16384;  // = 16384 LSB/g
 
@@ -75,5 +83,10 @@ void IMU::calibrate() {
 }
 
 void IMU::getYawPitchRoll(float *yaw, float *pitch, float *roll) {
-    // TODO
+    int16_t ax, ay, az, gx, gy, gz;
+    accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    Logger::debug("Accel: x=%6d y=%6d z=%6d\tGyro: x=%6d y=%6d z=%6d", ax, ay, az, gx, gy, gz);
+
+    // TODO: Sensor fusion
+    // TODO: Convert to YPR angles
 }

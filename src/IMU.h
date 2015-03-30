@@ -7,6 +7,9 @@ public:
     // Constructor
     IMU();
 
+    // Initialize the sensors
+    void initialize();
+
     // Set the horizontal refernce plane
     void calibrate();
 
