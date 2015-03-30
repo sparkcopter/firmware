@@ -1,11 +1,6 @@
 #include "Logger.h"
 #include "UserInput.h"
 
-typedef union _float_or_int_t {
-    float f;
-    int   i;
-} float_or_int_t;
-
 UserInput::UserInput(int port) {
     this->port = port;
 }
@@ -15,43 +10,57 @@ void UserInput::init() {
 }
 
 void UserInput::read() {
-    if(udp->parsePacket()) {
-        // Read UDP packet
-        int bytesRead = 0;
-        while(udp->available()) {
-            buffer[bytesRead++] = udp->read();
-        }
-        buffer[bytesRead] = '0';
+    // Check for UDP packets
+    if(!udp->parsePacket()) return;
 
-        // Split packet into AT commands
-        char *commandTokens;
-        char *command = strtok_r(buffer, "\r\n", &commandTokens);
-        while(command)  {
-            // Parse AT command
-            if(strncmp("AT*", command, 3) == 0) {
-                char *commandStart = command + 3;
-                if(strncmp("REF=", commandStart, 4) == 0) {
-                    handleRef(commandStart + 4);
-                } else if(strncmp("PCMD=", commandStart, 5) == 0) {
-                    handlePcmd(commandStart + 5);
-                } else if(strncmp("FTRIM=", commandStart, 6) == 0) {
-                    handleFtrim();
-                } else if(strncmp("CONFIG=", commandStart, 7) == 0) {
-                    handleConfig(commandStart + 7);
-                } else if(strncmp("LED=", commandStart, 4) == 0) {
-                    handleLed(commandStart + 4);
-                } else if(strncmp("ANIM=", commandStart, 5) == 0) {
-                    handleAnim(commandStart + 5);
-                } else {
-                    Logger::log("Received unknown AT command: %s", commandStart);
-                }
-            }
+    // Read UDP packet
+    int bytesRead = 0;
+    while(udp->available()) {
+        buffer[bytesRead++] = udp->read();
+    }
+    buffer[bytesRead] = '0';
 
-            // Get the next AT* command (if any)
-            command = strtok_r(NULL, "\r\n", &commandTokens);
+    // Split packet into AT commands
+    char *commandTokens;
+    char *command = strtok_r(buffer, "\r\n", &commandTokens);
+    while(command)  {
+        // Parse AT command
+        if(strncmp("AT*", command, 3) == 0) {
+            parseCommand(command + 3);
         }
 
-        udp->flush();
+        // Get the next AT* command (if any)
+        command = strtok_r(NULL, "\r\n", &commandTokens);
+    }
+
+    udp->flush();
+}
+
+void UserInput::parseCommand(char *command) {
+    char *argsStart = strchr(command, '=') + 1;
+    char *args;
+
+    // Check valid sequence number
+    int sequenceNumber = atoi(strtok_r(argsStart, ",", &args));
+    if(!validSequenceNumber(sequenceNumber)) return;
+
+    // Run the appropriate command
+    if(commandMatches("REF", command)) {
+        parseRef(args);
+    } else if(commandMatches("PCMD", command)) {
+        parsePcmd(args);
+    } else if(commandMatches("FTRIM", command)) {
+        parseFtrim(args);
+    } else if(commandMatches("CONFIG", command)) {
+        parseConfig(args);
+    } else if(commandMatches("CTRL", command)) {
+        parseCtrl(args);
+    } else if(commandMatches("LED", command)) {
+        parseLed(args);
+    } else if(commandMatches("ANIM", command)) {
+        parseAnim(args);
+    } else {
+        Logger::warn("Received unknown AT command: %s", command);
     }
 }
 
@@ -60,67 +69,65 @@ bool UserInput::validSequenceNumber(int sequenceNumber) {
     return true;
 }
 
+bool UserInput::commandMatches(const char *commandName, char *command) {
+    return strncmp(commandName, command, strlen(commandName)) == 0;
+}
+
 // AT*REF commands (Takeoff/Landing/Emergency stop command)
-void UserInput::handleRef(char *args) {
-    // Parse arguments
-    char *argTokens;
-
-    // Extract UDP sequence number
-    int sequenceNumber = atoi(strtok_r(args, ",", &argTokens));
-    if(!validSequenceNumber(sequenceNumber)) {
-        return;
-    }
-
+void UserInput::parseRef(char *args) {
     // Extract REF commands
-    int controlField = atoi(strtok_r(NULL, ",", &argTokens));
-    int takeoffBit = (controlField >> 9) & 1;
-    int emergencyBit = (controlField >> 8) & 1;
+    int controlField = atoi(strtok_r(NULL, ",", &args));
+    bool emergencyBit = (controlField >> 8) & 1;
+    bool takeoffBit = (controlField >> 9) & 1;
 
     // Run callback
-    takeoffBit ? takeoff() : land();
+    ref(emergencyBit, takeoffBit);
 }
 
 // AT*PCMD commands (Move the drone)
-void UserInput::handlePcmd(char *args) {
-    // Parse arguments
-    char *argTokens;
-
-    // Extract UDP sequence number
-    int sequenceNumber = atoi(strtok_r(args, ",", &argTokens));
-    if(!validSequenceNumber(sequenceNumber)) {
-        return;
-    }
-
-    // Extract movement mode (currently unused)
-    int progressive = (int)atoi(strtok_r(NULL, ",", &argTokens));
+void UserInput::parsePcmd(char *args) {
+    // Extract movement mode
+    int movementModeField = (int)atoi(strtok_r(NULL, ",", &args));
+    bool progressive = (movementModeField >> 0) & 1;
+    bool combinedYaw = (movementModeField >> 1) & 1;
 
     // Extract movement commands (floats stored as ints)
     float_or_int_t leftTilt, frontTilt, verticalSpeed, angularSpeed;
-    leftTilt.i = atoi(strtok_r(NULL, ",", &argTokens));
-    frontTilt.i = atoi(strtok_r(NULL, ",", &argTokens));
-    verticalSpeed.i = atoi(strtok_r(NULL, ",", &argTokens));
-    angularSpeed.i = atoi(strtok_r(NULL, ",", &argTokens));
+    leftTilt.i = atoi(strtok_r(NULL, ",", &args));
+    frontTilt.i = atoi(strtok_r(NULL, ",", &args));
+    verticalSpeed.i = atoi(strtok_r(NULL, ",", &args));
+    angularSpeed.i = atoi(strtok_r(NULL, ",", &args));
 
     // Run callback
-    move(leftTilt.f, frontTilt.f, verticalSpeed.f, angularSpeed.f);
+    pcmd(progressive, combinedYaw, leftTilt.f, frontTilt.f, verticalSpeed.f, angularSpeed.f);
 }
 
 // AT*FTRIM commands (Sets the reference for the horizontal plane)
-void UserInput::handleFtrim() {
-    // TODO
+void UserInput::parseFtrim(char *args) {
+    ftrim();
 }
 
 // AT*CONFIG commands (Sets config variables)
-void UserInput::handleConfig(char *args) {
+void UserInput::parseConfig(char *args) {
     // TODO
 }
 
+// AT*CTRL commands (Sets config variables)
+void UserInput::parseCtrl(char *args) {
+    int ctrlAction = (int)atoi(strtok_r(NULL, ",", &args));
+    if(ctrlAction == 4) {
+        // TODO: Dump configuration
+    } else if(ctrlAction == 5) {
+        // TODO: Reset CONFIG ACK state
+    }
+}
+
 // AT*LED (Set a led animation)
-void UserInput::handleLed(char *args) {
+void UserInput::parseLed(char *args) {
     // TODO
 }
 
 // AT*ANIM (Set a flight animation)
-void UserInput::handleAnim(char *args) {
+void UserInput::parseAnim(char *args) {
     // TODO
 }
