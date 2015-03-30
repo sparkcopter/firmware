@@ -130,6 +130,24 @@ public:
     // Set FIFO enabled status
     void setFifoEnabled(bool enabled);
 
+    // Get current FIFO buffer size
+    uint16_t getFIFOCount();
+
+    // Get the current accelerometer bias
+    int16_t getXAccelOffset();
+    int16_t getYAccelOffset();
+    int16_t getZAccelOffset();
+
+    // Set the accelerometer bias
+    void setXAccelOffset(int16_t offset);
+    void setYAccelOffset(int16_t offset);
+    void setZAccelOffset(int16_t offset);
+
+    // Set the gyroscope bias
+    void setXGyroOffset(int16_t offset);
+    void setYGyroOffset(int16_t offset);
+    void setZGyroOffset(int16_t offset);
+
     // Calibrate the sensors
     void calibrate();
 

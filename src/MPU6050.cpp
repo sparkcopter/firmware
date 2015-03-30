@@ -1,5 +1,6 @@
 #include "MPU6050.h"
 #include "Logger.h"
+#include <inttypes.h>
 
 MPU6050::MPU6050() {
     this->device = new I2C(MPU6050_DEFAULT_ADDRESS);
@@ -18,6 +19,7 @@ void MPU6050::initialize() {
 
 void MPU6050::reset() {
     device->writeBit(MPU6050_RA_PWR_MGMT_1, MPU6050_PWR1_DEVICE_RESET_BIT, true);
+    delay(50);
 }
 
 void MPU6050::setSleepEnabled(bool enabled) {
@@ -48,16 +50,60 @@ void MPU6050::setFifoEnabled(bool enabled) {
     device->writeBit(MPU6050_RA_USER_CTRL, MPU6050_USERCTRL_FIFO_EN_BIT, enabled);
 }
 
+uint16_t MPU6050::getFIFOCount() {
+    uint16_t fifoCount;
+    device->readWord(MPU6050_RA_FIFO_COUNTH, &fifoCount);
+    return fifoCount;
+}
+
+int16_t MPU6050::getXAccelOffset() {
+    int16_t offset;
+    device->readWord(MPU6050_RA_XA_OFFS_H, (uint16_t *)&offset);
+    return offset;
+}
+
+int16_t MPU6050::getYAccelOffset() {
+    int16_t offset;
+    device->readWord(MPU6050_RA_YA_OFFS_H, (uint16_t *)&offset);
+    return offset;
+}
+
+int16_t MPU6050::getZAccelOffset() {
+    int16_t offset;
+    device->readWord(MPU6050_RA_ZA_OFFS_H, (uint16_t *)&offset);
+    return offset;
+}
+
+void MPU6050::setXAccelOffset(int16_t offset) {
+    device->writeWord(MPU6050_RA_XA_OFFS_H, offset);
+}
+
+void MPU6050::setYAccelOffset(int16_t offset) {
+    device->writeWord(MPU6050_RA_YA_OFFS_H, offset);
+}
+
+void MPU6050::setZAccelOffset(int16_t offset) {
+    device->writeWord(MPU6050_RA_ZA_OFFS_H, offset);
+}
+
+void MPU6050::setXGyroOffset(int16_t offset) {
+    device->writeWord(MPU6050_RA_XG_OFFS_USRH, offset);
+}
+
+void MPU6050::setYGyroOffset(int16_t offset) {
+    device->writeWord(MPU6050_RA_YG_OFFS_USRH, offset);
+}
+
+void MPU6050::setZGyroOffset(int16_t offset) {
+    device->writeWord(MPU6050_RA_ZG_OFFS_USRH, offset);
+}
+
 void MPU6050::calibrate() {
-    uint16_t  gyrosensitivity  = 131;   // = 131 LSB/degrees/sec
-    uint16_t  accelsensitivity = 16384;  // = 16384 LSB/g
+    uint16_t accelsensitivity = 16384;  // = 16384 LSB/g
 
-    // Reset device registers and biases and wait for reset to complete
+    // Reset device registers and initialize device
     reset();
-    delay(100);
-
-    // Disable sleep mode
-    setSleepEnabled(false);
+    initialize();
 
     // Set low-pass filter to 188 Hz
     setDLPFMode(MPU6050_DLPF_BW_188);
@@ -65,13 +111,10 @@ void MPU6050::calibrate() {
     // Set sample rate to 1 kHz
     setRate(0);
 
-    // Set gyro full-scale to 250 degrees per second, maximum sensitivity
-    setFullScaleGyroRange(MPU6050_GYRO_FS_250);
+    // Wait for stable gyroscope data
+    delay(200);
 
-    // Set accelerometer full-scale to 2 g, maximum sensitivity
-    setFullScaleAccelRange(MPU6050_ACCEL_FS_2);
-
-    // Configure FIFO to capture accelerometer and gyro data for bias calculation
+    // Enable FIFO
     setFifoEnabled(true);
 
     // - Enable gyro and accelerometer sensors for FIFO
@@ -81,13 +124,9 @@ void MPU6050::calibrate() {
     delay(80);
     device->writeByte(MPU6050_RA_FIFO_EN, 0x0);
 
-    // Read FIFO sample count
-    uint16_t fifoCount;
-    device->readWord(MPU6050_RA_FIFO_COUNTH, &fifoCount);
-    uint16_t packetCount = fifoCount/12;
-
     // Combine all packets of calibration data
     int32_t gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0};
+    uint16_t packetCount = getFIFOCount()/12;
     for(int i=0; i<packetCount; i++) {
         // Read this packet's gyro and accel data
         int16_t accelTemp[3] = {0, 0, 0}, gyroTemp[3] = {0, 0, 0};
@@ -101,11 +140,14 @@ void MPU6050::calibrate() {
         }
     }
 
-    // Get the average of the calibration data
+    // Average the calibration data
     for(int d=0; d<3; d++) {
         accelBias[d] /= packetCount;
         gyroBias[d] /= packetCount;
     }
+
+    // Disable FIFO
+    setFifoEnabled(false);
 
     // Remove gravity from z-axis of accelerometer bias
     uint16_t  accelSensitivity = 16384;  // = 1g
@@ -113,21 +155,16 @@ void MPU6050::calibrate() {
 
     // Push gyro biases to hardware registers
     // Divide by 4 to get 32.9 LSB per deg/s to conform to expected bias input format
-    device->writeWord(MPU6050_RA_XG_OFFS_USRH, -gyroBias[0] / 4);
-    device->writeWord(MPU6050_RA_YG_OFFS_USRH, -gyroBias[1] / 4);
-    device->writeWord(MPU6050_RA_ZG_OFFS_USRH, -gyroBias[2] / 4);
+    setXGyroOffset(-gyroBias[0] / 4);
+    setYGyroOffset(-gyroBias[1] / 4);
+    setZGyroOffset(-gyroBias[2] / 4);
 
     // Read factory accelerometer trim values
-    int16_t accelBiasFactory[3];
-    device->readWord(MPU6050_RA_XA_OFFS_H, (uint16_t *)&accelBiasFactory[0]);
-    device->readWord(MPU6050_RA_YA_OFFS_H, (uint16_t *)&accelBiasFactory[1]);
-    device->readWord(MPU6050_RA_ZA_OFFS_H, (uint16_t *)&accelBiasFactory[2]);
-
     // Write total accelerometer bias, including calculated average accelerometer bias from above
     // Subtract calculated averaged accelerometer bias scaled to 2048 LSB/g (16 g full scale)
-    device->writeWord(MPU6050_RA_XA_OFFS_H, accelBiasFactory[0] - (accelBias[0]/8));
-    device->writeWord(MPU6050_RA_YA_OFFS_H, accelBiasFactory[1] - (accelBias[1]/8));
-    device->writeWord(MPU6050_RA_ZA_OFFS_H, accelBiasFactory[2] - (accelBias[2]/8));
+    setXAccelOffset(getXAccelOffset() - (accelBias[0] / 8));
+    setYAccelOffset(getYAccelOffset() - (accelBias[1] / 8));
+    setZAccelOffset(getZAccelOffset() - (accelBias[2] / 8));
 
     Logger::info("Calibrated sensors!");
     Logger::info("- Accelerometer bias: x=%6d y=%6d z=%6d", accelBias[0], accelBias[1], accelBias[2]);
