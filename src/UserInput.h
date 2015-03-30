@@ -2,11 +2,15 @@
 
 #include <spark_wiring_udp.h>
 
-#define UDP_BUFFER_SIZE 1024
+#define USER_INPUT_UDP_BUFFER_SIZE  1024
+#define USER_INPUT_UDP_NAVDATA_PORT 5554
+#define USER_INPUT_UDP_VIDEO_PORT   5556
+#define USER_INPUT_UDP_AT_PORT      5556
+#define USER_INPUT_UDP_CONTROL_PORT 5559
 
 class UserInput {
 public:
-    UserInput(int port);
+    UserInput();
 
     void init();
     void read();
@@ -18,8 +22,7 @@ public:
 private:
     UDP *udp = new UDP();
 
-    int port;
-    char buffer[UDP_BUFFER_SIZE];
+    char buffer[USER_INPUT_UDP_BUFFER_SIZE];
     int lastSequenceNumber;
 
     bool validSequenceNumber(int sequenceNumber);

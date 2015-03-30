@@ -4,7 +4,6 @@
 #include "UserInput.h"
 
 // Constants
-#define USER_INPUT_UDP_PORT     5556
 #define MOTOR_PIN_FRONT_LEFT    A5
 #define MOTOR_PIN_FRONT_RIGHT   A4
 #define MOTOR_PIN_BACK_LEFT     A0
@@ -20,7 +19,7 @@ Motor motorBackLeft = Motor(MOTOR_PIN_BACK_LEFT);
 Motor motorBackRight = Motor(MOTOR_PIN_BACK_RIGHT);
 
 // User input
-UserInput userInput = UserInput(USER_INPUT_UDP_PORT);
+UserInput userInput;
 
 unsigned long printTimer = millis();
 unsigned long lastTrim = 0;

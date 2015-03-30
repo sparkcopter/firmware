@@ -1,12 +1,12 @@
 #include "Logger.h"
 #include "UserInput.h"
 
-UserInput::UserInput(int port) {
-    this->port = port;
+UserInput::UserInput() {
+
 }
 
 void UserInput::init() {
-    udp->begin(port);
+    udp->begin(USER_INPUT_UDP_AT_PORT);
 }
 
 void UserInput::read() {
