@@ -1,4 +1,5 @@
 #include "MPU6050.h"
+#include "Logger.h"
 
 MPU6050::MPU6050() {
     this->device = new I2C(MPU6050_DEFAULT_ADDRESS);
@@ -128,9 +129,9 @@ void MPU6050::calibrate() {
     device->writeWord(MPU6050_RA_YA_OFFS_H, accelBiasFactory[1] - (accelBias[1]/8));
     device->writeWord(MPU6050_RA_ZA_OFFS_H, accelBiasFactory[2] - (accelBias[2]/8));
 
-    Logger::info("Calibrated sensors!")
-    Logger::info("- Accelerometer bias: x=%6d y=%6d z=%6d", accelBias[0], accelBias[1], accelBias[2])
-    Logger::info("- Gyroscope bias:     x=%6d y=%6d z=%6d", gyroBias[0], gyroBias[1], gyroBias[2])
+    Logger::info("Calibrated sensors!");
+    Logger::info("- Accelerometer bias: x=%6d y=%6d z=%6d", accelBias[0], accelBias[1], accelBias[2]);
+    Logger::info("- Gyroscope bias:     x=%6d y=%6d z=%6d", gyroBias[0], gyroBias[1], gyroBias[2]);
 }
 
 void MPU6050::getRawMotion(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz) {
