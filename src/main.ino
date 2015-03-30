@@ -11,7 +11,7 @@
 #define MOTOR_PIN_BACK_RIGHT    A1
 
 // Sensor inputs
-MPU6050 *sensors = new MPU6050();
+MPU6050 accelgyro;
 
 // Motors
 Motor *motorFrontLeft = new Motor(MOTOR_PIN_FRONT_LEFT);
@@ -59,7 +59,8 @@ void pcmd(bool progressive, bool combinedYaw, float leftTilt, float frontTilt, f
 void ftrim() {
     unsigned long now = millis();
     if(lastTrim == 0 || now > lastTrim + 5000) {
-        sensors->calibrate();
+        /*sensors->calibrate();*/
+
         RGB.color(255, 255, 0); // Yellow LED - landed calibrated
         lastTrim = now;
     }
@@ -83,8 +84,7 @@ void setup() {
     userInput->ftrim = &ftrim;
 
     // Initialize sensors
-    sensors->reset();
-    sensors->initialize();
+    accelgyro.initialize();
 
     // Spin up all motors for testing
     motorFrontLeft->setSpeed(255);
@@ -105,9 +105,9 @@ void loop() {
     userInput->read();
 
     // Read sensors
-    int16_t accelX, accelY, accelZ, gyroX, gyroY, gyroZ;
-    sensors->getRawMotion(&accelX, &accelY, &accelZ, &gyroX, &gyroY, &gyroZ);
-    Logger::debug("Accel: x=%6d y=%6d z=%6d\tGyro: x=%6d y=%6d z=%6d", accelX, accelY, accelZ, gyroX, gyroY, gyroZ);
+    int16_t ax, ay, az, gx, gy, gz;
+    accelgyro.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    Logger::debug("Accel: x=%6d y=%6d z=%6d\tGyro: x=%6d y=%6d z=%6d", ax, ay, az, gx, gy, gz);
 
     delay(10);
 }
