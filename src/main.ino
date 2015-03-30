@@ -22,35 +22,69 @@ Motor *motorBackRight = new Motor(MOTOR_PIN_BACK_RIGHT);
 // User input
 UserInput *userInput = new UserInput(USER_INPUT_UDP_PORT);
 
+unsigned long printTimer = millis();
+unsigned long lastTrim = 0;
+
 // Control callbacks
-void takeoff() {
-    RGB.color(0, 255, 0);
+volatile bool emergency = false;
+volatile bool takeoff = false;
+
+void ref(bool pEmergency, bool pTakeoff) {
+    Logger::debug("Prev: %d %d", emergency, takeoff);
+    Logger::debug("Ref: %d %d", pEmergency, pTakeoff);
+    // Takeoff state has changed
+    if(takeoff != pTakeoff) {
+        if(pTakeoff) {
+            Logger::debug("Changed state to 'takeoff'");
+            RGB.color(0, 255, 0);
+        } else {
+            Logger::debug("Changed state to 'land'");
+            RGB.color(255, 0, 0);
+        }
+
+        takeoff = pTakeoff;
+    }
+
+    // Emergency state has changed
+    if(emergency != pEmergency) {
+        // TODO: Something
+        emergency = pEmergency;
+    }
 }
 
-void land() {
-    RGB.color(255, 0, 0);
+void pcmd(bool progressive, bool combinedYaw, float leftTilt, float frontTilt, float verticalSpeed, float angularSpeed) {
+    // TODO
 }
 
-void move(float leftTilt, float frontTilt, float verticalSpeed, float angularSpeed) {
-    /*Logger::log("Move: %f, %f, %f, %f", leftTilt, frontTilt, verticalSpeed, angularSpeed);*/
+void ftrim() {
+    unsigned long now = millis();
+    if(lastTrim == 0 || now > lastTrim + 5000) {
+        sensors->calibrate();
+        RGB.color(255, 255, 0); // Yellow LED - landed calibrated
+        lastTrim = now;
+    }
 }
 
 void setup() {
+    // Enable I2C bus
+    Wire.begin();
+
     // Enable serial logging
     Logger::init();
 
     // Set up spark LED
     RGB.control(true);
-    RGB.color(255, 0, 0);
+    RGB.color(255, 0, 0); // Red LED - landed and not calibrated
 
     // Initialize user input and attach callbacks
     userInput->init();
-    userInput->takeoff = &takeoff;
-    userInput->land = &land;
-    userInput->move = &move;
+    userInput->ref = &ref;
+    userInput->pcmd = &pcmd;
+    userInput->ftrim = &ftrim;
 
     // Initialize sensors
-    sensors->init();
+    sensors->reset();
+    sensors->initialize();
 
     // Spin up all motors for testing
     motorFrontLeft->setSpeed(255);
@@ -60,19 +94,20 @@ void setup() {
 }
 
 void loop() {
-    // Get the spark's IP address
-    /*IPAddress myIp = WiFi.localIP();*/
-    /*Logger::log("IP: %d.%d.%d.%d", myIp[0], myIp[1], myIp[2], myIp[3]);*/
+    // Debug info
+    if(millis() > printTimer + 5000) {
+        IPAddress myIp = WiFi.localIP();
+        Logger::debug("IP: %d.%d.%d.%d", myIp[0], myIp[1], myIp[2], myIp[3]);
+        printTimer = millis();
+    }
 
     // Read control input
     userInput->read();
 
     // Read sensors
-    float accelX, accelY, accelZ, gyroX, gyroY, gyroZ;
-    sensors->getMotion(&accelX, &accelY, &accelZ, &gyroX, &gyroY, &gyroZ);
-    /*Logger::log("Accel: x=%f y=%f z=%f", accelX, accelY, accelZ);*/
-    /*Logger::log("Gyro: x=%f y=%f z=%f", gyroX, gyroY, gyroZ);*/
-
+    int16_t accelX, accelY, accelZ, gyroX, gyroY, gyroZ;
+    sensors->getRawMotion(&accelX, &accelY, &accelZ, &gyroX, &gyroY, &gyroZ);
+    Logger::debug("Accel: x=%6d y=%6d z=%6d\tGyro: x=%6d y=%6d z=%6d", accelX, accelY, accelZ, gyroX, gyroY, gyroZ);
 
     delay(10);
 }
