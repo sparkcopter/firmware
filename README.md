@@ -1,7 +1,7 @@
 Sparkcopter Firmware
 ====================
 
-Firmware and code tutorial for a from-scratch [Spark Core](http://spark.io) based quadcopter. Currently a work in progress.
+Firmware and code tutorial for the Sparkcopter, a [Spark Core](http://spark.io) based quadcopter. Currently a work in progress.
 
 
 Contents
