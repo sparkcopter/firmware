@@ -64,18 +64,12 @@ void pcmd(bool progressive, bool combinedYaw, float leftTilt, float frontTilt, f
         motorFrontLeft.setSpeed((int)(255 * leftTilt));
     } else if(leftTilt < 0) {
         motorBackLeft.setSpeed((int)(-255 * leftTilt));
-    } else {
-        motorFrontLeft.stop();
-        motorBackLeft.stop();
     }
 
     if(frontTilt > 0) {
         motorFrontRight.setSpeed((int)(255 * frontTilt));
     } else if(frontTilt < 0) {
         motorBackRight.setSpeed((int)(-255 * frontTilt));
-    } else {
-        motorFrontRight.stop();
-        motorBackRight.stop();
     }
 }
 
@@ -127,4 +121,6 @@ void loop() {
 
         printTimer = millis();
     }
+
+    delay(10);
 }
