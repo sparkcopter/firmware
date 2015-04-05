@@ -83,3 +83,9 @@ Our hardware contains an MPU-6050 chip, which has an on-board gyroscope and acce
 - TODO: What is a PID controller
 - TODO: Combining gyro rotation rate with desired rotation rate (rate control)
 - TODO: Combining sensor angles with desired angles (stabilized control)
+
+
+License
+-------
+
+The Sparkcopter firmware free software released under the MIT License. See [LICENSE.txt](LICENSE.txt) for details.
