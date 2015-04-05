@@ -26,6 +26,7 @@ void UserInput::read() {
     while(command)  {
         // Parse AT command
         if(strncmp("AT*", command, 3) == 0) {
+            Logger::debug("UserInput::read # %s", command);
             parseCommand(command + 3);
         }
 
