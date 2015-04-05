@@ -1,5 +1,4 @@
 FIRMWARE=sparkcopter.bin
-SPARK_NAME=shark
 
 .PHONY: clean
 
