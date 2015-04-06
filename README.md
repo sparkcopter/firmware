@@ -48,7 +48,7 @@ Tutorial
 
 Our hardware contains an MPU-6050 chip, which has an on-board gyroscope and accelerometer. The MPU-6050's sensor data is accessible over the [I2C bus](http://en.wikipedia.org/wiki/I%C2%B2C), via the `D0/SDA` and `D1/SCL` pins on the Spark Core.
 
-Raw I2C access is possible using Spark's [Wire](http://docs.spark.io/firmware/#communication-wire) library, but for easier access we'll use Jeff Rowberg's excellent [i2cdevlib](https://github.com/jrowberg/i2cdevlib) library which includes some convenient wrapper functions for accessing sensor data from our [MPU-6050](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050).
+Raw I2C access is possible using Spark's [Wire](http://docs.spark.io/firmware/#communication-wire) library, but for easier access we'll use Jeff Rowberg's excellent [i2cdevlib](https://github.com/jrowberg/i2cdevlib) library which includes some [convenient wrapper functions](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050) for accessing sensor data from our MPU-6050.
 
 > Note: The i2cdevlib library doesn't yet support the Spark Core out of the box, so check out my [my pull request](https://github.com/jrowberg/i2cdevlib/pull/156) which adds support.
 
