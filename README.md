@@ -105,7 +105,7 @@ As an accelerometer measures all forces that are working on the object, it will 
 
 Gyroscope measurements have the tendency to drift, not returning to zero when the system returns to its original position. The gyroscope data is reliable only on the short term, as it starts to drift on the long term.
 
-Sensor fusion gives us the "best of both worlds". On the short term, we use the data from the gyroscope, because it is very precise and not susceptible to external forces. On the long term, we use the data from the accelerometer, as it does not drift. In it's most simple form, the filter looks as follows:
+Sensor fusion gives us the "best of both worlds". On the short term, we use the data from the gyroscope, because it is very precise and not susceptible to external forces. On the long term, we use the data from the accelerometer, as it does not drift.
 
 There are various techniques available to combine this data, including the famous [Kalman Filter](http://en.wikipedia.org/wiki/Kalman_filter), but we'll be using the faster [Madgwick Direct Cosine Matrix Filter](http://www.x-io.co.uk/open-source-imu-and-ahrs-algorithms/).
 
