@@ -1,6 +1,7 @@
 #include "Logger.h"
 #include "IMU.h"
 #include "Motor.h"
+#include "PID.h"
 #include "UserInput.h"
 
 // Constants
@@ -21,7 +22,12 @@ Motor motorBackRight = Motor(MOTOR_PIN_BACK_RIGHT);
 // User input
 UserInput userInput;
 
+// PIDs
+PID rollPid = PID(0.02, 1, 2, 20);
+PID pitchPid = PID(0.02, 1, 2, 20);
+
 unsigned long printTimer = millis();
+unsigned long pidTimer = millis();
 unsigned long lastTrim = 0;
 
 // Control callbacks
@@ -59,18 +65,7 @@ void ref(bool pEmergency, bool pTakeoff) {
 }
 
 void pcmd(bool progressive, bool combinedYaw, float leftTilt, float frontTilt, float verticalSpeed, float angularSpeed) {
-    // Allow testing the individual motors
-    if(leftTilt > 0) {
-        motorFrontLeft.setSpeed((int)(255 * leftTilt));
-    } else if(leftTilt < 0) {
-        motorBackLeft.setSpeed((int)(-255 * leftTilt));
-    }
 
-    if(frontTilt > 0) {
-        motorFrontRight.setSpeed((int)(255 * frontTilt));
-    } else if(frontTilt < 0) {
-        motorBackRight.setSpeed((int)(-255 * frontTilt));
-    }
 }
 
 void ftrim() {
@@ -101,16 +96,37 @@ void setup() {
 
     // Initialize sensors
     imu.initialize();
+
+    // Set up PIDs
+    rollPid.setSetPoint(0);
+    rollPid.setInputLimits(-180, 180);
+    rollPid.setOutputLimits(-20, 20);
+
+    pitchPid.setSetPoint(0);
+    pitchPid.setInputLimits(-90, 90);
+    pitchPid.setOutputLimits(-20, 20);
 }
 
 void loop() {
     // Read control input
     userInput.read();
-    imu.update();
 
     // Read sensors
     float yaw, pitch, roll;
+    imu.update();
     imu.getYawPitchRoll(&yaw, &pitch, &roll);
+
+    if(millis() > pidTimer + 20) {
+        rollPid.setProcessValue(roll);
+        pitchPid.setProcessValue(pitch);
+
+        float rollPower = rollPid.compute();
+        float pitchPower = pitchPid.compute();
+
+        Logger::debug("power: roll=%f, pitch=%f", rollPower, pitchPower);
+
+        pidTimer = millis();
+    }
 
     // Debug info
     if(millis() > printTimer + 50) {
@@ -121,6 +137,4 @@ void loop() {
 
         printTimer = millis();
     }
-
-    delay(10);
 }
