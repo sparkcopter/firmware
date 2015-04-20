@@ -6,17 +6,17 @@ UserInput::UserInput() {
 }
 
 void UserInput::init() {
-    udp->begin(USER_INPUT_UDP_AT_PORT);
+    udp.begin(USER_INPUT_UDP_AT_PORT);
 }
 
 void UserInput::read() {
     // Check for UDP packets
-    if(!udp->parsePacket()) return;
+    if(!udp.parsePacket()) return;
 
     // Read UDP packet
     int bytesRead = 0;
-    while(udp->available()) {
-        buffer[bytesRead++] = udp->read();
+    while(udp.available()) {
+        buffer[bytesRead++] = udp.read();
     }
     buffer[bytesRead] = '0';
 
@@ -34,7 +34,7 @@ void UserInput::read() {
         command = strtok_r(NULL, "\r\n", &commandTokens);
     }
 
-    udp->flush();
+    udp.flush();
 }
 
 void UserInput::parseCommand(char *command) {
@@ -110,7 +110,7 @@ void UserInput::parseFtrim(char *args) {
 
 // AT*CONFIG commands (Sets config variables)
 void UserInput::parseConfig(char *args) {
-    // TODO
+    // Logger::debug("C");
 }
 
 // AT*CTRL commands (Sets config variables)

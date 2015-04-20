@@ -127,6 +127,8 @@ There are various techniques available to combine this data, including the famou
 
 ### Stabilized Control
 
+http://en.wikipedia.org/wiki/PID_controller
+
 - TODO: What is a PID controller
 - TODO: Combining gyro rotation rate with desired rotation rate (rate control)
 - TODO: Combining sensor angles with desired angles (stabilized control)
