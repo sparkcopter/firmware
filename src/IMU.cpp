@@ -1,12 +1,16 @@
 #include "IMU.h"
 #include "Logger.h"
-#include "MadgwickFilter.h"
 #include "ComplementaryFilter.h"
+#include "KalmanFilter.h"
+#include "MadgwickFilter.h"
 
 IMU::IMU(uint8_t filterType) {
     switch(filterType) {
         case IMU_FILTER_COMPLEMENTARY:
             this->filter = new ComplementaryFilter();
+            break;
+        case IMU_FILTER_KALMAN:
+            this->filter = new KalmanFilter();
             break;
         case IMU_FILTER_MADGWICK:
             this->filter = new MadgwickFilter();

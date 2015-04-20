@@ -6,9 +6,6 @@
 #include "MPU6050.h"
 #include "IMUFilter.h"
 
-#define IMU_FILTER_COMPLEMENTARY    0
-#define IMU_FILTER_MADGWICK         1
-
 class IMU {
 public:
     // Constructor
