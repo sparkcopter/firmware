@@ -1,17 +1,19 @@
 #include "Logger.h"
 #include "IMU.h"
 #include "Motor.h"
-#include "PID.h"
+#include "NavData.h"
 #include "UserInput.h"
 
 // Constants
-#define MOTOR_PIN_FRONT_LEFT    A0
-#define MOTOR_PIN_FRONT_RIGHT   A1
-#define MOTOR_PIN_BACK_RIGHT    A4
-#define MOTOR_PIN_BACK_LEFT     A5
+#define MOTOR_PIN_FRONT_LEFT    A5
+#define MOTOR_PIN_FRONT_RIGHT   A0
+#define MOTOR_PIN_BACK_RIGHT    A1
+#define MOTOR_PIN_BACK_LEFT     A4
+
+#define MOTOR_MAX_POWER         255
 
 // Sensor inputs
-IMU imu;
+IMU imu(IMU_FILTER_MADGWICK);
 
 // Motors
 Motor motorFrontLeft = Motor(MOTOR_PIN_FRONT_LEFT);
@@ -20,14 +22,11 @@ Motor motorBackLeft = Motor(MOTOR_PIN_BACK_LEFT);
 Motor motorBackRight = Motor(MOTOR_PIN_BACK_RIGHT);
 
 // User input
-UserInput userInput;
+UserInput userInput = UserInput();
+NavData navData = NavData();
 
-// PIDs
-PID rollPid = PID(0.02, 1, 2, 20);
-PID pitchPid = PID(0.02, 1, 2, 20);
-
+// Timers
 unsigned long printTimer = millis();
-unsigned long pidTimer = millis();
 unsigned long lastTrim = 0;
 
 // Control callbacks
@@ -41,10 +40,10 @@ void ref(bool pEmergency, bool pTakeoff) {
             Logger::debug("Changed state to 'takeoff'");
             RGB.color(0, 255, 0);
 
-            motorFrontLeft.setSpeed(255);
-            motorFrontRight.setSpeed(255);
-            motorBackLeft.setSpeed(255);
-            motorBackRight.setSpeed(255);
+            motorFrontLeft.setSpeed(MOTOR_MAX_POWER);
+            motorFrontRight.setSpeed(MOTOR_MAX_POWER);
+            motorBackLeft.setSpeed(MOTOR_MAX_POWER);
+            motorBackRight.setSpeed(MOTOR_MAX_POWER);
         } else {
             Logger::debug("Changed state to 'land'");
             RGB.color(255, 0, 0);
@@ -94,46 +93,30 @@ void setup() {
     userInput.pcmd = &pcmd;
     userInput.ftrim = &ftrim;
 
+    navData.init();
+
     // Initialize sensors
     imu.initialize();
-
-    // Set up PIDs
-    rollPid.setSetPoint(0);
-    rollPid.setInputLimits(-180, 180);
-    rollPid.setOutputLimits(-20, 20);
-
-    pitchPid.setSetPoint(0);
-    pitchPid.setInputLimits(-90, 90);
-    pitchPid.setOutputLimits(-20, 20);
 }
 
 void loop() {
     // Read control input
     userInput.read();
 
+    //
+    navData.checkForClient();
+    navData.send();
+
     // Read sensors
-    float yaw, pitch, roll;
     imu.update();
-    imu.getYawPitchRoll(&yaw, &pitch, &roll);
-
-    if(millis() > pidTimer + 20) {
-        rollPid.setProcessValue(roll);
-        pitchPid.setProcessValue(pitch);
-
-        float rollPower = rollPid.compute();
-        float pitchPower = pitchPid.compute();
-
-        Logger::debug("power: roll=%f, pitch=%f", rollPower, pitchPower);
-
-        pidTimer = millis();
-    }
+    Vector3 orientation = imu.getOrientation();
 
     // Debug info
     if(millis() > printTimer + 50) {
         /*IPAddress myIp = WiFi.localIP();
         Logger::debug("IP: %d.%d.%d.%d", myIp[0], myIp[1], myIp[2], myIp[3]);*/
 
-        Logger::debug("yaw/pitch/roll: %f/%f/%f", yaw, pitch, roll);
+        Logger::debug("roll/pitch/yaw: %f/%f/%f", orientation.x, orientation.y, orientation.z);
 
         printTimer = millis();
     }

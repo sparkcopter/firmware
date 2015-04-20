@@ -3,6 +3,7 @@
 #include <spark_wiring_udp.h>
 
 #define USER_INPUT_UDP_BUFFER_SIZE  1024
+
 #define USER_INPUT_UDP_NAVDATA_PORT 5554
 #define USER_INPUT_UDP_VIDEO_PORT   5556
 #define USER_INPUT_UDP_AT_PORT      5556
@@ -20,7 +21,7 @@ public:
     void (*ftrim)(void);
 
 private:
-    UDP *udp = new UDP();
+    UDP udp = UDP();
 
     char buffer[USER_INPUT_UDP_BUFFER_SIZE];
     int lastSequenceNumber;
