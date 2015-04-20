@@ -5,7 +5,7 @@ FIRMWARE=sparkcopter.bin
 all: $(FIRMWARE)
 
 $(FIRMWARE):
-	spark compile src --saveTo $(FIRMWARE)
+	spark compile . --saveTo $(FIRMWARE)
 
 install: $(FIRMWARE)
 	spark flash $(SPARK_NAME) $(FIRMWARE)
