@@ -44,11 +44,10 @@ void NavData::send() {
         // Write the vision flag (not used)
         writeLongWord(0);
 
-        // Write the time option tag
+        // Write some options data
+        writeDemo();
         writeTime();
-
-        // Write the demo option
-        // writeDemo();
+        // writeRawMeasures();
 
         // Write the checksum
         writeChecksum();
@@ -56,6 +55,10 @@ void NavData::send() {
         // Write the buffer
         flush();
     }
+}
+
+void NavData::updateOrientation(Vector3 orientation) {
+    this->orientation = orientation;
 }
 
 void NavData::writeHeader() {
@@ -66,18 +69,21 @@ void NavData::writeSequenceNumber() {
     writeLongWord(sequenceNumber);
 }
 
-void NavData::writeChecksum() {
-    int checksum = 0;
-    for(int i=0; i<bufferSize; i++) {
-        checksum += buffer[i];
-    }
+void NavData::writeDemo() {
+    navdata_demo_t payload;
 
-    navdata_cks_t payload;
-    payload.tag = NAVDATA_CKS_TAG;
-    payload.size = sizeof(navdata_cks_t);
-    payload.cks = checksum;
+    memset(&payload, 0, sizeof(navdata_demo_t));
 
-    writeBuffer(&payload, sizeof(navdata_cks_t));
+    payload.tag = NAVDATA_DEMO_TAG;
+    payload.size = sizeof(navdata_demo_t);
+
+    payload.theta = orientation.y * 1000.0;
+    payload.phi = orientation.x * 1000.0;
+    payload.psi = orientation.z * 1000.0;
+
+    // TODO: Anything else
+
+    writeBuffer(&payload, sizeof(navdata_demo_t));
 }
 
 void NavData::writeTime() {
@@ -93,16 +99,31 @@ void NavData::writeTime() {
     writeBuffer(&payload, sizeof(navdata_time_t));
 }
 
-void NavData::writeDemo() {
-    navdata_demo_t payload;
-    payload.tag = NAVDATA_DEMO_TAG;
-    payload.size = sizeof(navdata_demo_t);
+void NavData::writeRawMeasures() {
+    navdata_raw_measures_t payload;
 
-    // TODO: Real flight data
-    payload.theta = 15000;
+    memset(&payload, 0, sizeof(navdata_raw_measures_t));
 
+    payload.tag = NAVDATA_RAW_MEASURES_TAG;
+    payload.size = sizeof(navdata_raw_measures_t);
 
-    writeBuffer(&payload, sizeof(navdata_demo_t));
+    // TODO
+
+    writeBuffer(&payload, sizeof(navdata_raw_measures_t));
+}
+
+void NavData::writeChecksum() {
+    int checksum = 0;
+    for(int i=0; i<bufferSize; i++) {
+        checksum += buffer[i];
+    }
+
+    navdata_cks_t payload;
+    payload.tag = NAVDATA_CKS_TAG;
+    payload.size = sizeof(navdata_cks_t);
+    payload.cks = checksum;
+
+    writeBuffer(&payload, sizeof(navdata_cks_t));
 }
 
 void NavData::writeBuffer(void *buf, uint8_t size) {

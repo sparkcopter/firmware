@@ -2,6 +2,8 @@
 
 #include <spark_wiring_udp.h>
 
+#include "Vector3.h"
+
 #define _ATTRIBUTE_PACKED_  __attribute__ ((packed))
 
 #define NAVDATA_UDP_PORT 5554
@@ -17,6 +19,7 @@ public:
     void init();
     void checkForClient();
     void send();
+    void updateOrientation(Vector3 orientation);
 
 private:
     enum NavDataTag {
@@ -45,9 +48,10 @@ private:
 
     void writeHeader();
     void writeSequenceNumber();
-    void writeChecksum();
-    void writeTime();
     void writeDemo();
+    void writeTime();
+    void writeRawMeasures();
+    void writeChecksum();
     void writeBuffer(void *buf, uint8_t size);
     void writeLongWord(int32_t longWord);
     void flush();
@@ -63,40 +67,60 @@ private:
     uint8_t buffer[1024];
     int lastFlush = 0;
 
+    Vector3 orientation;
+
     // Demo option
     typedef struct {
-      uint16_t tag;
-      uint16_t size;
+        uint16_t tag;
+        uint16_t size;
 
-      uint32_t ctrl_state;             // Flying state (landed, flying, hovering, etc.) defined in CTRL_STATES enum.
-      uint32_t vbat_flying_percentage; // Battery voltage
+        uint32_t ctrl_state;             // Flying state (landed, flying, hovering, etc.) defined in CTRL_STATES enum.
+        uint32_t vbat_flying_percentage; // Battery voltage
 
-      float theta;                     // Pitch in milli-degrees
-      float phi;                       // Roll in milli-degrees
-      float psi;                       // Yaw in mill-degrees
+        float theta;                     // Pitch in milli-degrees
+        float phi;                       // Roll in milli-degrees
+        float psi;                       // Yaw in mill-degrees
 
-      int32_t altitude;                // Altitude in CM
+        int32_t altitude;                // Altitude in CM
 
-      float   vx;                      // Estimated linear x-axis speed
-      float   vy;                      // Estimated linear y-axis speed
-      float   vz;                      // Estimated linear z-axis speed
+        float   vx;                      // Estimated linear x-axis speed
+        float   vy;                      // Estimated linear y-axis speed
+        float   vz;                      // Estimated linear z-axis speed
 
-      int32_t unused[27];
+        int32_t unused[27];
     }_ATTRIBUTE_PACKED_ navdata_demo_t;
 
     // Time option
     typedef struct {
-      uint16_t  tag;
-      uint16_t  size;
+        uint16_t  tag;
+        uint16_t  size;
 
-      uint32_t  time;                  // 11 MSB = seconds, 21 LSB = microseconds
+        uint32_t  time;                  // 11 MSB = seconds, 21 LSB = microseconds
     }_ATTRIBUTE_PACKED_ navdata_time_t;
+
+    // Raw measures option
+    typedef struct {
+        uint16_t  tag;
+        uint16_t  size;
+
+        uint16_t  raw_accs[3];          // filtered accelerometers
+        uint16_t  raw_gyros[3];         // filtered gyrometers
+        uint16_t  raw_gyros_110[2];     // gyrometers  x/y 110°/s
+        uint32_t  vbat_raw;             // battery voltage raw (mV)
+        uint16_t  us_debut_echo;
+        uint16_t  us_fin_echo;
+        uint16_t  us_association_echo;
+        uint16_t  us_distance_echo;
+        uint16_t  us_courbe_temps;
+        uint16_t  us_courbe_valeur;
+        uint16_t  us_courbe_ref;
+    }_ATTRIBUTE_PACKED_ navdata_raw_measures_t;
 
     // Checksum option
     typedef struct {
-      uint16_t  tag;
-      uint16_t  size;
+        uint16_t  tag;
+        uint16_t  size;
 
-      uint32_t  cks;                   // Integer sum of all bytes in buffer
+        uint32_t  cks;                   // Integer sum of all bytes in buffer
     }_ATTRIBUTE_PACKED_ navdata_cks_t;
 };

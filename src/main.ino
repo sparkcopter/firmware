@@ -103,13 +103,12 @@ void loop() {
     // Read control input
     userInput.read();
 
-    //
-    navData.checkForClient();
-    navData.send();
-
     // Read sensors
     imu.update();
     Vector3 orientation = imu.getOrientation();
+
+    // Update navdata info
+    navData.updateOrientation(orientation);
 
     // Debug info
     if(millis() > printTimer + 50) {
@@ -120,4 +119,8 @@ void loop() {
 
         printTimer = millis();
     }
+
+    // Send latest nav data
+    navData.checkForClient();
+    navData.send();
 }
