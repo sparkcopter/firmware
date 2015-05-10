@@ -1,7 +1,7 @@
 #include "MadgwickFilter.h"
 
 void MadgwickFilter::update(Vector3 accel, Vector3 gyro) {
-    uint32_t now = micros();
+    uint32_t now = millis();
     float deltat = ((now - lastUpdate)/1000000.0f);
     lastUpdate = now;
 

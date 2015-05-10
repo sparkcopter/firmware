@@ -13,7 +13,7 @@
 #define MOTOR_MAX_POWER         255
 
 // Sensor inputs
-IMU imu(IMU_FILTER_MADGWICK);
+IMU imu(IMU_FILTER_COMPLEMENTARY);
 
 // Motors
 Motor motorFrontLeft = Motor(MOTOR_PIN_FRONT_LEFT);
