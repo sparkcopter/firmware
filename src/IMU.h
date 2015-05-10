@@ -29,7 +29,7 @@ private:
     float accelScale;
     IMUFilter *filter;
 
-    uint32_t lastUpdate = 0;
+    unsigned long lastUpdate = 0;
 
     Vector3 accel;
     Vector3 gyro;

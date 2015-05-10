@@ -3,6 +3,8 @@
 #include "ComplementaryFilter.h"
 #include "MadgwickFilter.h"
 
+#define MICROS_ROLLOVER ((unsigned long)59652323)
+
 IMU::IMU(uint8_t filterType) {
     switch(filterType) {
         case IMU_FILTER_COMPLEMENTARY:
@@ -15,7 +17,7 @@ IMU::IMU(uint8_t filterType) {
             break;
     }
 
-    lastUpdate = millis();
+    lastUpdate = micros();
 }
 
 void IMU::initialize() {
@@ -99,8 +101,11 @@ void IMU::calibrate() {
 
 void IMU::update() {
     // Get the time since last update
-    uint32_t now = millis();
-    double dt = (double)(now - lastUpdate) / 1000.0;
+    // NOTE: Spark's micros() function rolls over every ~59 seconds due to a bug!
+    // https://community.spark.io/t/micros-rolling-over-after-59-652323-seconds-not-71-minutes-solved
+    unsigned long now = micros();
+    unsigned long delta = now - lastUpdate;
+    if((long)delta < 0) delta += MICROS_ROLLOVER;
     lastUpdate = now;
 
     // Get the raw accelerometer and gyroscope readings
@@ -118,7 +123,7 @@ void IMU::update() {
     gyro.z = (double)rgz/gyroScale;
 
     // Update filter
-    filter->update(accel, gyro, dt);
+    filter->update(accel, gyro, (double)delta / 1000000.0);
 }
 
 Vector3 IMU::getOrientation() {
