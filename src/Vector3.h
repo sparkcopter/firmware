@@ -10,4 +10,18 @@ public:
     double x = 0.0;
     double y = 0.0;
     double z = 0.0;
+
+    double norm() {
+        return sqrt(x*x + y*y + z*z);
+    }
+
+    void normalize() {
+        double n = norm();
+
+        if(n > 0) {
+            x /= n;
+            y /= n;
+            z /= n;
+        }
+    }
 };
