@@ -2,7 +2,7 @@
 
 void MadgwickFilter::update(Vector3 accel, Vector3 gyro) {
     uint32_t now = millis();
-    float deltat = ((now - lastUpdate)/1000000.0f);
+    float deltat = ((now - lastUpdate)/1000.0f);
     lastUpdate = now;
 
     float norm;                                               // vector norm
