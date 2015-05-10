@@ -9,7 +9,7 @@
 
 class MadgwickFilter : public IMUFilter {
 public:
-    void update(Vector3 accel, Vector3 gyro);
+    void update(Vector3 accel, Vector3 gyro, double dt);
     Vector3 getOrientation();
 
 private:
@@ -19,6 +19,4 @@ private:
     float zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  // compute zeta, the other free parameter in the Madgwick scheme usually set to a small or zero value
 
     float q1 = 1.0f, q2 = 0.0f, q3 = 0.0f, q4 = 0.0f;
-
-    uint32_t lastUpdate = 0;
 };

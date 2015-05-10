@@ -1,27 +1,18 @@
 #include "ComplementaryFilter.h"
 
-void ComplementaryFilter::update(Vector3 accel, Vector3 gyro) {
-    uint32_t now = millis();
-    float deltat = ((now - lastUpdate)/1000.0f);
-    lastUpdate = now;
-
-    // Integrate gyroscope data (turn radians per second into degrees)
-    orientation.x += RADIANS_TO_DEGREES(gyro.x) * deltat;
-    orientation.y -= RADIANS_TO_DEGREES(gyro.y) * deltat;
-    orientation.z += RADIANS_TO_DEGREES(gyro.z) * deltat;
-
+void ComplementaryFilter::update(Vector3 accel, Vector3 gyro, double dt) {
     // Get accelerometer orientation
-    Vector3 accelOrientation;
-    accelOrientation.x = RADIANS_TO_DEGREES(atan2f(accel.y, accel.z));
-    accelOrientation.y = RADIANS_TO_DEGREES(atan2f(accel.x, accel.z));
-    accelOrientation.z = 0; // Yaw data from accelerometer is junk
+    // See "Tilt Sensing Using a Three-Axis Accelerometer" eqns 37 and 38
+    // http://cache.freescale.com/files/sensors/doc/app_note/AN3461.pdf
+    double accelRoll = atan2(accel.y, copysign(sqrt(accel.z * accel.z + 0.01 * accel.x * accel.x), accel.z)) * RAD_TO_DEG;
+    double accelPitch = atan2(-accel.x, sqrt(accel.y * accel.y + accel.z * accel.z)) * RAD_TO_DEG;
 
-    // Combine gyroscope and accelerometer data
-    orientation.x = orientation.x * CF_GYRO_WEIGHT + accelOrientation.x * CF_ACCEL_WEIGHT;
-    orientation.y = orientation.y * CF_GYRO_WEIGHT + accelOrientation.y * CF_ACCEL_WEIGHT;
+    // Combine gyroscope and accelerometer data for roll and pitch
+    orientation.x = CF_GYRO_WEIGHT * (orientation.x + gyro.x * dt) + CF_ACCEL_WEIGHT * accelRoll;
+    orientation.y = CF_GYRO_WEIGHT * (orientation.y + gyro.y * dt) + CF_ACCEL_WEIGHT * accelPitch;
 
-    // Restrict yaw range to -180 -> 180
-    orientation.z = remainder(orientation.z, 360);
+    // Use gyroscope data for yaw, restrict range to -180 -> 180
+    orientation.z = remainder(orientation.z + gyro.z * dt, 360);
 }
 
 Vector3 ComplementaryFilter::getOrientation() {

@@ -1,7 +1,6 @@
 #include "IMU.h"
 #include "Logger.h"
 #include "ComplementaryFilter.h"
-#include "KalmanFilter.h"
 #include "MadgwickFilter.h"
 
 IMU::IMU(uint8_t filterType) {
@@ -9,15 +8,14 @@ IMU::IMU(uint8_t filterType) {
         case IMU_FILTER_COMPLEMENTARY:
             this->filter = new ComplementaryFilter();
             break;
-        case IMU_FILTER_KALMAN:
-            this->filter = new KalmanFilter();
-            break;
         case IMU_FILTER_MADGWICK:
             this->filter = new MadgwickFilter();
             break;
         default:
             break;
     }
+
+    lastUpdate = millis();
 }
 
 void IMU::initialize() {
@@ -100,21 +98,27 @@ void IMU::calibrate() {
 }
 
 void IMU::update() {
+    // Get the time since last update
+    uint32_t now = millis();
+    double dt = (double)(now - lastUpdate) / 1000.0;
+    lastUpdate = now;
+
+    // Get the raw accelerometer and gyroscope readings
     int16_t rax, ray, raz, rgx, rgy, rgz;
     accelgyro.getMotion6(&rax, &ray, &raz, &rgx, &rgy, &rgz);
 
     // Convert raw accelerometer readings into Gs
-    accel.x = (float)rax/accelScale;
-    accel.y = (float)ray/accelScale;
-    accel.z = (float)raz/accelScale;
+    accel.x = (double)rax/accelScale;
+    accel.y = (double)ray/accelScale;
+    accel.z = (double)raz/accelScale;
 
-    // Convert raw gyroscope readings into radians per second
-    gyro.x = (float)rgx/gyroScale * M_PI/180.0f;
-    gyro.y = (float)rgy/gyroScale * M_PI/180.0f;
-    gyro.z = (float)rgz/gyroScale * M_PI/180.0f;
+    // Convert raw gyroscope readings into degrees per second
+    gyro.x = (double)rgx/gyroScale;
+    gyro.y = (double)rgy/gyroScale;
+    gyro.z = (double)rgz/gyroScale;
 
     // Update filter
-    filter->update(accel, gyro);
+    filter->update(accel, gyro, dt);
 }
 
 Vector3 IMU::getOrientation() {

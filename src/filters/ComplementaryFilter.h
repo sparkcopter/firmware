@@ -1,7 +1,7 @@
 #pragma once
 
-#define CF_GYRO_WEIGHT  0.95
-#define CF_ACCEL_WEIGHT (1 - CF_GYRO_WEIGHT)
+#define CF_GYRO_WEIGHT      0.90
+#define CF_ACCEL_WEIGHT     (1 - CF_GYRO_WEIGHT)
 
 #include "stdint.h"
 
@@ -12,10 +12,9 @@
 
 class ComplementaryFilter : public IMUFilter {
 public:
-    void update(Vector3 accel, Vector3 gyro);
+    void update(Vector3 accel, Vector3 gyro, double dt);
     Vector3 getOrientation();
 
 private:
     Vector3 orientation;
-    uint32_t lastUpdate = 0;
 };

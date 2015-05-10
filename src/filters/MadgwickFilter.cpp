@@ -1,9 +1,10 @@
 #include "MadgwickFilter.h"
 
-void MadgwickFilter::update(Vector3 accel, Vector3 gyro) {
-    uint32_t now = millis();
-    float deltat = ((now - lastUpdate)/1000.0f);
-    lastUpdate = now;
+void MadgwickFilter::update(Vector3 accel, Vector3 gyro, double dt) {
+    // Convert gyro readings into radians per second
+    gyro.x *= DEG_TO_RAD;
+    gyro.y *= DEG_TO_RAD;
+    gyro.z *= DEG_TO_RAD;
 
     float norm;                                               // vector norm
     float f1, f2, f3;                                         // objetive funcyion elements
@@ -62,9 +63,9 @@ void MadgwickFilter::update(Vector3 accel, Vector3 gyro) {
     gerrz = _2q1 * hatDot4 - _2q2 * hatDot3 + _2q3 * hatDot2 - _2q4 * hatDot1;
 
     // Compute and remove gyroscope biases
-    gbiasx += gerrx * deltat * zeta;
-    gbiasy += gerry * deltat * zeta;
-    gbiasz += gerrz * deltat * zeta;
+    gbiasx += gerrx * dt * zeta;
+    gbiasy += gerry * dt * zeta;
+    gbiasz += gerrz * dt * zeta;
     gyro.x -= gbiasx;
     gyro.y -= gbiasy;
     gyro.z -= gbiasz;
@@ -76,10 +77,10 @@ void MadgwickFilter::update(Vector3 accel, Vector3 gyro) {
     qDot4 =  _halfq1 * gyro.z + _halfq2 * gyro.y - _halfq3 * gyro.x;
 
     // Compute then integrate estimated quaternion derivative
-    q1 += (qDot1 -(beta * hatDot1)) * deltat;
-    q2 += (qDot2 -(beta * hatDot2)) * deltat;
-    q3 += (qDot3 -(beta * hatDot3)) * deltat;
-    q4 += (qDot4 -(beta * hatDot4)) * deltat;
+    q1 += (qDot1 -(beta * hatDot1)) * dt;
+    q2 += (qDot2 -(beta * hatDot2)) * dt;
+    q3 += (qDot3 -(beta * hatDot3)) * dt;
+    q4 += (qDot4 -(beta * hatDot4)) * dt;
 
     // Normalize the quaternion
     norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
