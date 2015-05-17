@@ -1,10 +1,8 @@
 #pragma once
 
-#include "math.h"
-
-#include "Vector3.h"
-#include "Quarternion.h"
 #include "IMUFilter.h"
+#include "Quarternion.h"
+#include "Vector3.h"
 
 class MadgwickFilter : public IMUFilter {
 public:

@@ -3,8 +3,6 @@
 #define CF_GYRO_WEIGHT      0.90
 #define CF_ACCEL_WEIGHT     (1 - CF_GYRO_WEIGHT)
 
-#include "stdint.h"
-
 #include "spark_wiring.h"
 
 #include "IMUFilter.h"

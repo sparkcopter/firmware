@@ -1,5 +1,7 @@
 #pragma once
 
+#include "math.h"
+
 #include "Vector3.h"
 
 class Quarternion {
@@ -15,10 +17,13 @@ public:
 
     void normalize() {
         double n = norm();
-        w /= n;
-        x /= n;
-        y /= n;
-        z /= n;
+
+        if(n > 0) {
+            w /= n;
+            x /= n;
+            y /= n;
+            z /= n;
+        }
     }
 
     Vector3 toEuler() {
