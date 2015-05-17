@@ -3,10 +3,6 @@
 #include "Logger.h"
 #include "NavData.h"
 
-NavData::NavData() {
-
-}
-
 void NavData::init() {
     udp.begin(NAVDATA_UDP_PORT);
 }

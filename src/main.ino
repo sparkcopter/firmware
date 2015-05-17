@@ -1,80 +1,53 @@
 #include "Logger.h"
-#include "IMU.h"
-#include "Motor.h"
 #include "NavData.h"
+#include "Quadcopter.h"
 #include "UserInput.h"
 
-// Constants
-#define MOTOR_PIN_FRONT_LEFT    A5
-#define MOTOR_PIN_FRONT_RIGHT   A0
-#define MOTOR_PIN_BACK_RIGHT    A1
-#define MOTOR_PIN_BACK_LEFT     A4
 
-#define MOTOR_MAX_POWER         255
+//
+// Set up our component parts
+//
 
-// Sensor inputs
-IMU imu(IMU_FILTER_COMPLEMENTARY);
-
-// Motors
-Motor motorFrontLeft = Motor(MOTOR_PIN_FRONT_LEFT);
-Motor motorFrontRight = Motor(MOTOR_PIN_FRONT_RIGHT);
-Motor motorBackLeft = Motor(MOTOR_PIN_BACK_LEFT);
-Motor motorBackRight = Motor(MOTOR_PIN_BACK_RIGHT);
+// Quadcopter
+Quadcopter quadcopter = Quadcopter(QUADCOPTER_CONFIGURATION_X);
 
 // User input
 UserInput userInput = UserInput();
-NavData navData = NavData();
 
-// Timers
-unsigned long printTimer = millis();
-unsigned long lastTrim = 0;
 
-// Control callbacks
-volatile bool emergency = false;
+//
+// Define control callbacks
+//
+
+// Takeoff and land commands
 volatile bool takeoff = false;
-
 void ref(bool pEmergency, bool pTakeoff) {
-    // Takeoff state has changed
     if(takeoff != pTakeoff) {
         if(pTakeoff) {
-            Logger::debug("Changed state to 'takeoff'");
-            RGB.color(0, 255, 0);
-
-            motorFrontLeft.setSpeed(MOTOR_MAX_POWER);
-            motorFrontRight.setSpeed(MOTOR_MAX_POWER);
-            motorBackLeft.setSpeed(MOTOR_MAX_POWER);
-            motorBackRight.setSpeed(MOTOR_MAX_POWER);
+            quadcopter.takeOff();;
         } else {
-            Logger::debug("Changed state to 'land'");
-            RGB.color(255, 0, 0);
-
-            motorFrontLeft.setSpeed(0);
-            motorFrontRight.setSpeed(0);
-            motorBackLeft.setSpeed(0);
-            motorBackRight.setSpeed(0);
+            quadcopter.land();
         }
 
         takeoff = pTakeoff;
     }
-
-    // Emergency state has changed
-    if(emergency != pEmergency) {
-        emergency = pEmergency;
-    }
 }
 
+// Movement commands
 void pcmd(bool progressive, bool combinedYaw, float leftTilt, float frontTilt, float verticalSpeed, float angularSpeed) {
-
+    quadcopter.setMovement(leftTilt, frontTilt, verticalSpeed, angularSpeed);
 }
 
+// Trim command
 void ftrim() {
-    unsigned long now = millis();
-    if(lastTrim == 0 || now > lastTrim + 5000) {
-        imu.calibrate();
-        RGB.color(255, 255, 0);
-        lastTrim = now;
-    }
+    // TODO: de-bounce multiple trim command sent in quick succession
+    quadcopter.trim();
 }
+
+
+//
+// Spark's setup and loop commands
+//
 
 void setup() {
     // Enable I2C bus
@@ -94,34 +67,21 @@ void setup() {
     userInput.pcmd = &pcmd;
     userInput.ftrim = &ftrim;
 
-    navData.init();
+    // Initialize quadcopter
+    quadcopter.initialize();
 
-    // Initialize sensors
-    imu.initialize();
+    // Initialize navigation data stream
+    NavData::getInstance().init();
 }
 
 void loop() {
     // Read control input
     userInput.read();
 
-    // Read sensors
-    imu.update();
-    Vector3 orientation = imu.getOrientation();
-
-    // Update navdata info
-    navData.updateOrientation(orientation);
-
-    // Debug info
-    if(millis() > printTimer + 50) {
-        /*IPAddress myIp = WiFi.localIP();
-        Logger::debug("IP: %d.%d.%d.%d", myIp[0], myIp[1], myIp[2], myIp[3]);*/
-
-        Logger::debug("roll/pitch/yaw: %f/%f/%f", orientation.x, orientation.y, orientation.z);
-
-        printTimer = millis();
-    }
+    // Process user inputs and sensor data
+    quadcopter.process();
 
     // Send latest nav data
-    navData.checkForClient();
-    navData.send();
+    NavData::getInstance().checkForClient();
+    NavData::getInstance().send();
 }

@@ -14,7 +14,10 @@
 
 class NavData {
 public:
-    NavData();
+    static NavData& getInstance() {
+        static NavData instance;
+        return instance;
+    }
 
     void init();
     void checkForClient();
