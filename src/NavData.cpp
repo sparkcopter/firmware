@@ -44,6 +44,7 @@ void NavData::send() {
         writeDemo();
         writeTime();
         // writeRawMeasures();
+        // writePwm();
 
         // Write the checksum
         writeChecksum();
@@ -55,6 +56,13 @@ void NavData::send() {
 
 void NavData::updateOrientation(Vector3 orientation) {
     this->orientation = orientation;
+}
+
+void NavData::updateMotors(uint8_t motor1, uint8_t motor2, uint8_t motor3, uint8_t motor4) {
+    this->motor1 = motor1;
+    this->motor2 = motor2;
+    this->motor3 = motor3;
+    this->motor4 = motor4;
 }
 
 void NavData::writeHeader() {
@@ -79,7 +87,7 @@ void NavData::writeDemo() {
 
     // TODO: Anything else
 
-    writeBuffer(&payload, sizeof(navdata_demo_t));
+    writeBuffer(&payload, payload.size);
 }
 
 void NavData::writeTime() {
@@ -92,7 +100,7 @@ void NavData::writeTime() {
     payload.size = sizeof(navdata_time_t);
     payload.time = convertedTime;
 
-    writeBuffer(&payload, sizeof(navdata_time_t));
+    writeBuffer(&payload, payload.size);
 }
 
 void NavData::writeRawMeasures() {
@@ -105,7 +113,23 @@ void NavData::writeRawMeasures() {
 
     // TODO
 
-    writeBuffer(&payload, sizeof(navdata_raw_measures_t));
+    writeBuffer(&payload, payload.size);
+}
+
+void NavData::writePwm() {
+    navdata_pwm_t payload;
+
+    memset(&payload, 0, sizeof(navdata_pwm_t));
+
+    payload.tag = NAVDATA_PWM_TAG;
+    payload.size = sizeof(navdata_pwm_t);
+
+    payload.motor1 = motor1;
+    payload.motor2 = motor2;
+    payload.motor3 = motor3;
+    payload.motor4 = motor4;
+
+    writeBuffer(&payload, payload.size);
 }
 
 void NavData::writeChecksum() {

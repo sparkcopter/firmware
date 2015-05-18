@@ -23,6 +23,7 @@ public:
     void checkForClient();
     void send();
     void updateOrientation(Vector3 orientation);
+    void updateMotors(uint8_t motor1, uint8_t motor2, uint8_t motor3, uint8_t motor4);
 
 private:
     enum NavDataTag {
@@ -54,6 +55,7 @@ private:
     void writeDemo();
     void writeTime();
     void writeRawMeasures();
+    void writePwm();
     void writeChecksum();
     void writeBuffer(void *buf, uint8_t size);
     void writeLongWord(int32_t longWord);
@@ -71,6 +73,10 @@ private:
     int lastFlush = 0;
 
     Vector3 orientation;
+    uint8_t motor1;
+    uint8_t motor2;
+    uint8_t motor3;
+    uint8_t motor4;
 
     // Demo option
     typedef struct {
@@ -118,6 +124,37 @@ private:
         uint16_t  us_courbe_valeur;
         uint16_t  us_courbe_ref;
     }_ATTRIBUTE_PACKED_ navdata_raw_measures_t;
+
+    // Motor information
+    typedef struct {
+        uint16_t    tag;
+        uint16_t    size;
+
+        uint8_t     motor1;
+        uint8_t     motor2;
+        uint8_t     motor3;
+        uint8_t     motor4;
+        uint8_t     sat_motor1;
+        uint8_t     sat_motor2;
+        uint8_t     sat_motor3;
+        uint8_t     sat_motor4;
+        int32_t     gaz_feed_forward;
+        int32_t     gaz_altitude;
+        float       altitude_integral;
+        float       vz_ref;
+        int32_t     u_pitch;
+        int32_t     u_roll;
+        int32_t     u_yaw;
+        float       yaw_u_I;
+        int32_t     u_pitch_planif;
+        int32_t     u_roll_planif;
+        int32_t     u_yaw_planif;
+        float       u_gaz_planif;
+        uint16_t    current_motor1;
+        uint16_t    current_motor2;
+        uint16_t    current_motor3;
+        uint16_t    current_motor4;
+    }_ATTRIBUTE_PACKED_ navdata_pwm_t;
 
     // Checksum option
     typedef struct {

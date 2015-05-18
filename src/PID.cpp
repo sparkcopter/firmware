@@ -49,8 +49,6 @@ double PID::update(double processVariable) {
         // Compute PID output
         output = proportionalTerm + integralTerm + derivativeTerm;
 
-        // Logger::debug("proportionalTerm=%f integralTerm=%f derivativeTerm=%f output=%f", proportionalTerm, integralTerm, derivativeTerm, output);
-
         // Ensure output is within output range
         if(output > outMax) {
             output = outMax;
