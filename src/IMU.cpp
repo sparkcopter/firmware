@@ -45,12 +45,20 @@ void IMU::calibrate() {
     // Enable FIFO
     accelgyro.setFIFOEnabled(true);
 
-    // - Enable gyro and accelerometer sensors for FIFO
-    // - Accumulate 80 samples in 80 milliseconds = 960 bytes (max fifo size is 1024)
-    // - Disable fifo sensors
-    I2Cdev::writeByte(MPU6050_ADDRESS_AD0_LOW, MPU6050_RA_FIFO_EN, 0x78);
+    // Enable gyro and accelerometer sensors for FIFO
+    accelgyro.setAccelFIFOEnabled(true);
+    accelgyro.setXGyroFIFOEnabled(true);
+    accelgyro.setYGyroFIFOEnabled(true);
+    accelgyro.setZGyroFIFOEnabled(true);
+
+    // Accumulate 80 samples in 80 milliseconds = 960 bytes (max fifo size is 1024)
     delay(80);
-    I2Cdev::writeByte(MPU6050_ADDRESS_AD0_LOW, MPU6050_RA_FIFO_EN, 0x0);
+
+    // Disable gyro and accelerometer sensors for FIFO
+    accelgyro.setAccelFIFOEnabled(false);
+    accelgyro.setXGyroFIFOEnabled(false);
+    accelgyro.setYGyroFIFOEnabled(false);
+    accelgyro.setZGyroFIFOEnabled(false);
 
     // Combine all packets of calibration data
     int32_t gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0};
@@ -78,7 +86,7 @@ void IMU::calibrate() {
     accelgyro.setFIFOEnabled(false);
 
     // Remove gravity from z-axis of accelerometer bias
-    uint16_t  accelSensitivity = 16384;  // = 1g
+    uint16_t accelSensitivity = 16384;  // = 1g
     accelBias[2] > 0 ? accelBias[2] -= accelSensitivity : accelBias[2] += accelSensitivity;
 
     // Push gyro biases to hardware registers
