@@ -5,13 +5,13 @@ FIRMWARE=sparkcopter.bin
 all: $(FIRMWARE)
 
 $(FIRMWARE):
-	spark compile . --saveTo $(FIRMWARE)
+	particle compile . --saveTo $(FIRMWARE)
 
 install: $(FIRMWARE)
-	spark flash $(SPARK_NAME) $(FIRMWARE)
+	particle flash $(SPARK_NAME) $(FIRMWARE)
 
 install-usb: $(FIRMWARE)
-	spark flash --usb $(FIRMWARE)
+	particle flash --usb $(FIRMWARE)
 
 clean:
 	rm -f *.bin
