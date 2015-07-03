@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdio.h>
 #include <stdarg.h>
 #include <spark_wiring_usbserial.h>
 

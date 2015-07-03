@@ -1,3 +1,9 @@
+// TODO: Remove when this is fixed upstream
+// https://community.particle.io/t/compilation-of-core-code-for-photon-gives-errors/12195/11
+#ifdef PLATFORM_ID
+#include "i2c_hal.h"
+#endif
+
 #include "Logger.h"
 #include "NavData.h"
 #include "Quadcopter.h"
