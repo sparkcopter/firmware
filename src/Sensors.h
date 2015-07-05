@@ -7,13 +7,13 @@
 
 class Sensors {
 public:
-  static void initialize();
+    static void initialize();
 
-  static bool barometerAvailable();
-  static bool compassAvailable();
+    static bool barometerAvailable();
+    static bool compassAvailable();
 
-  static Accelerometer *getAccelerometer();
-  static Barometer *getBarometer();
-  static Compass *getCompass();
-  static Gyroscope *getGyroscope();
+    static Accelerometer *getAccelerometer();
+    static Barometer *getBarometer();
+    static Compass *getCompass();
+    static Gyroscope *getGyroscope();
 };

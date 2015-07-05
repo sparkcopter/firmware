@@ -9,16 +9,16 @@
 
 class HAL_HMC5883L : public Compass {
 public:
-  static HAL_HMC5883L& getInstance() {
-    static HAL_HMC5883L instance;
-    return instance;
-  }
+    static HAL_HMC5883L& getInstance() {
+        static HAL_HMC5883L instance;
+        return instance;
+    }
 
-  void initialize();
-  Vector3 getHeading();
+    void initialize();
+    Vector3 getHeading();
 
 private:
-  HMC5883L device;
+    HMC5883L device;
 };
 
 #endif // HMC5883L_INSTALLED

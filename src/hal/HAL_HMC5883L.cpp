@@ -5,15 +5,15 @@
 #include "HAL_HMC5883L.h"
 
 void HAL_HMC5883L::initialize() {
-  // TODO
+    // TODO
 }
 
 Vector3 HAL_HMC5883L::getHeading() {
-  Vector3 heading;
+    Vector3 heading;
 
-  // TODO
+    // TODO
 
-  return heading;
+    return heading;
 }
 
 #endif // HMC5883L_INSTALLED

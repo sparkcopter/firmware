@@ -5,15 +5,15 @@
 #include "HAL_AK8975.h"
 
 void HAL_AK8975::initialize() {
-  // TODO
+    // TODO
 }
 
 Vector3 HAL_AK8975::getHeading() {
-  Vector3 heading;
+    Vector3 heading;
 
-  // TODO
+    // TODO
 
-  return heading;
+    return heading;
 }
 
 #endif // AK8975_INSTALLED

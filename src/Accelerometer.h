@@ -4,6 +4,6 @@
 
 class Accelerometer {
 public:
-  // Get the current acceleration vector, in Gs
-  virtual Vector3 getAcceleration() = 0;
+    // Get the current acceleration vector, in Gs
+    virtual Vector3 getAcceleration() = 0;
 };

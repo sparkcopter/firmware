@@ -10,19 +10,19 @@
 
 class HAL_MPU6050 : public Accelerometer, public Gyroscope {
 public:
-  static HAL_MPU6050& getInstance() {
-    static HAL_MPU6050 instance;
-    return instance;
-  }
+    static HAL_MPU6050& getInstance() {
+        static HAL_MPU6050 instance;
+        return instance;
+    }
 
-  void initialize();
-  Vector3 getAcceleration();
-  Vector3 getRotation();
+    void initialize();
+    Vector3 getAcceleration();
+    Vector3 getRotation();
 
 private:
-  MPU6050 device;
-  double gyroScale;
-  double accelScale;
+    MPU6050 device;
+    double gyroScale;
+    double accelScale;
 };
 
 #endif // MPU6050_INSTALLED

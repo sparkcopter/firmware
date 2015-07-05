@@ -14,16 +14,17 @@ SYSTEM_MODE(AUTOMATIC);
 IMU imu;
 
 void setup() {
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  Wire.setSpeed(CLOCK_SPEED_400KHZ);
-  Wire.begin();
+    Wire.setSpeed(CLOCK_SPEED_400KHZ);
+    Wire.begin();
 
-  imu.initialize();
+    imu.initialize();
 }
 
 void loop() {
-  Vector3 orientation = imu.getOrientation();
+    imu.update();
+    Vector3 orientation = imu.getOrientation();
 
-  delay(10);
+    delay(10);
 }
