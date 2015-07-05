@@ -86,6 +86,7 @@ THE SOFTWARE.
 
 #ifdef SPARK
     #include <application.h>
+    #include <math.h> // required for BMP180
     #define ARDUINO 101
     #define BUFFER_LENGTH 32
 #endif
