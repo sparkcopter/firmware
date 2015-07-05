@@ -13,6 +13,9 @@ public:
     // Initialize sensors
     void initialize();
 
+    // Calibrate sensors on ground level
+    void groundCalibrate();
+
     // Update orientation and altitude from sensor data
     void update();
 

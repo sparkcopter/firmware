@@ -8,10 +8,13 @@
 
 #include "IMU.h"
 #include "MPU6050.h"
+#include "SerialTelemetryTransport.h"
+#include "Telemetry.h"
 
 SYSTEM_MODE(AUTOMATIC);
 
 IMU imu;
+Telemetry *telemetry;
 
 void setup() {
     Serial.begin(115200);
@@ -20,11 +23,16 @@ void setup() {
     Wire.begin();
 
     imu.initialize();
+
+    telemetry = Telemetry::getInstance();
+    telemetry->setTransport(new SerialTelemetryTransport());
 }
 
 void loop() {
     imu.update();
     Vector3 orientation = imu.getOrientation();
+
+    telemetry->send();
 
     delay(10);
 }
