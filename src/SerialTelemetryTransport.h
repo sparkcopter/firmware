@@ -5,6 +5,5 @@
 
 class SerialTelemetryTransport : public TelemetryTransport {
 public:
-    SerialTelemetryTransport();
     void sendTelemetry(Telemetry *telemetry);
 };
