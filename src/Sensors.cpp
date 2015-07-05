@@ -35,6 +35,12 @@ void Sensors::initialize() {
     #endif
 }
 
+void Sensors::groundCalibrate() {
+    #ifdef MPU6050_INSTALLED
+    HAL_MPU6050::getInstance().groundCalibrate();
+    #endif
+}
+
 Accelerometer *Sensors::getAccelerometer() {
     #if ACCELEROMETER_TYPE == MPU6050
     return &HAL_MPU6050::getInstance();

@@ -16,6 +16,7 @@ public:
     }
 
     void initialize();
+    void groundCalibrate();
     Vector3 getAcceleration();
     Vector3 getRotation();
 

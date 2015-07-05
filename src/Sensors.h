@@ -8,6 +8,7 @@
 class Sensors {
 public:
     static void initialize();
+    static void groundCalibrate();
 
     static bool barometerAvailable();
     static bool compassAvailable();

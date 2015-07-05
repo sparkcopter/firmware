@@ -1,7 +1,5 @@
 #include "application.h"
 
-#include "Accelerometer.h"
-#include "Gyroscope.h"
 #include "IMU.h"
 #include "Sensors.h"
 
@@ -11,6 +9,10 @@ IMU::IMU() {
 
 void IMU::initialize() {
     Sensors::initialize();
+}
+
+void IMU::groundCalibrate() {
+    Sensors::groundCalibrate();
 }
 
 void IMU::update() {
