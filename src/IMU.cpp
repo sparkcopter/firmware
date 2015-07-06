@@ -57,12 +57,20 @@ void IMU::update() {
         telemetry->heading = heading;
 
         // Convert to scalar compass heading
-        double scalarHeading = atan2(heading.y, heading.x);
-        if(scalarHeading < 0) {
-            scalarHeading += 2*M_PI;
+        double magneticHeading = atan2(heading.y, heading.x) * 180/M_PI;
+        if(magneticHeading < 0) {
+            magneticHeading += 360.0;
         }
 
-        orientation.z = scalarHeading * 180/M_PI;
+        orientation.z = magneticHeading;
+
+        // TODO: Compensate heading for tilt
+        // http://cache.freescale.com/files/sensors/doc/app_note/AN4248.pdf
+        // http://forum.arduino.cc/index.php?topic=8573.0
+        // compensatedYaw = atan2(-heading.y * cos(orientation.x) + heading.z * sin(orientation.x), heading.x * cos(orientation.y) + heading.z * sin(orientation.y) * sin(orientation.x) + heading.z * sin(orientation.y) * cos(orientation.x)) *180/PI;
+
+        // TODO: Convert from magnetic north to true north?
+        // http://www.magnetic-declination.com/
     } else {
         // Use gyroscope data for yaw, restrict range to -180 -> 180
         orientation.z = remainder(orientation.z + rotation.z * dt, 360);
