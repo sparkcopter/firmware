@@ -77,7 +77,7 @@ Gyroscope *Sensors::getGyroscope() {
     #endif
 }
 
-bool barometerAvailable() {
+bool Sensors::barometerAvailable() {
     #ifdef BAROMETER_TYPE
     return true;
     #else
@@ -85,7 +85,7 @@ bool barometerAvailable() {
     #endif
 }
 
-bool compassAvailable() {
+bool Sensors::compassAvailable() {
     #ifdef COMPASS_TYPE
     return true;
     #else

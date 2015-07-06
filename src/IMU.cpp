@@ -21,6 +21,8 @@ void IMU::groundCalibrate() {
 }
 
 void IMU::update() {
+    Telemetry *telemetry = Telemetry::getInstance();
+
     // Get the time since last update
     // NOTE: Spark's micros() function rolls over every ~59 seconds due to a bug!
     // https://community.spark.io/t/micros-rolling-over-after-59-652323-seconds-not-71-minutes-solved
@@ -34,6 +36,10 @@ void IMU::update() {
     Vector3 acceleration = Sensors::getAccelerometer()->getAcceleration();
     Vector3 rotation = Sensors::getGyroscope()->getRotation();
 
+    // Update telemetry
+    telemetry->acceleration = acceleration;
+    telemetry->rotation = rotation;
+
     // Get accelerometer orientation
     // See "Tilt Sensing Using a Three-Axis Accelerometer" eqns 37 and 38
     // http://cache.freescale.com/files/sensors/doc/app_note/AN3461.pdf
@@ -44,13 +50,25 @@ void IMU::update() {
     orientation.x = CF_GYRO_WEIGHT * (orientation.x + rotation.x * dt) + CF_ACCEL_WEIGHT * accelRoll;
     orientation.y = CF_GYRO_WEIGHT * (orientation.y + rotation.y * dt) + CF_ACCEL_WEIGHT * accelPitch;
 
-    // Use gyroscope data for yaw, restrict range to -180 -> 180
-    orientation.z = remainder(orientation.z + rotation.z * dt, 360);
+    // Calculate yaw using compass, fall back to gyroscope data
+    if(Sensors::compassAvailable()) {
+        // Get heading vector
+        Vector3 heading = Sensors::getCompass()->getHeading();
+        telemetry->heading = heading;
+
+        // Convert to scalar compass heading
+        double scalarHeading = atan2(heading.y, heading.x);
+        if(scalarHeading < 0) {
+            scalarHeading += 2*M_PI;
+        }
+
+        orientation.z = scalarHeading * 180/M_PI;
+    } else {
+        // Use gyroscope data for yaw, restrict range to -180 -> 180
+        orientation.z = remainder(orientation.z + rotation.z * dt, 360);
+    }
 
     // Update telemetry
-    Telemetry *telemetry = Telemetry::getInstance();
-    telemetry->acceleration = acceleration;
-    telemetry->rotation = rotation;
     telemetry->orientation = orientation;
 }
 

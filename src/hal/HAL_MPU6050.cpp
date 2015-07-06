@@ -7,6 +7,9 @@
 void HAL_MPU6050::initialize() {
     device.initialize();
 
+    // Allow direct access to other sensors on the i2c bus
+    device.setI2CBypassEnabled(true);
+
     accelScale = 2048.0 * pow(2, 3 - device.getFullScaleAccelRange());
     gyroScale = 16.4 * pow(2, 3 - device.getFullScaleGyroRange());
 }

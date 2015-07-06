@@ -19,6 +19,7 @@ public:
 
 private:
     HMC5883L device;
+    float magScale;
 };
 
 #endif // HMC5883L_INSTALLED

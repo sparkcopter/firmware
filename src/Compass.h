@@ -4,6 +4,6 @@
 
 class Compass {
 public:
-    // Get the current heading vector, in microteslas (TODO: check this unit)
+    // Get the current heading vector, in Guass
     virtual Vector3 getHeading() = 0;
 };

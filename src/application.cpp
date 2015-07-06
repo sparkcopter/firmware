@@ -9,12 +9,15 @@
 #include "IMU.h"
 #include "MPU6050.h"
 #include "NavdataTelemetryTransport.h"
+#include "SerialTelemetryTransport.h"
 #include "Telemetry.h"
 
 IMU imu;
 Telemetry *telemetry;
 
 void setup() {
+    Spark.disconnect();
+
     Serial.begin(115200);
 
     Wire.setSpeed(CLOCK_SPEED_400KHZ);
@@ -23,9 +26,11 @@ void setup() {
     imu.initialize();
 
     telemetry = Telemetry::getInstance();
-    telemetry->setTransport(new NavdataTelemetryTransport());
+    telemetry->setTransport(new SerialTelemetryTransport());
+    // telemetry->setTransport(new NavdataTelemetryTransport());
 
-    Spark.disconnect();
+    RGB.control(true);
+    RGB.color(255, 165, 0);
 }
 
 void loop() {
