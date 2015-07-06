@@ -2,7 +2,7 @@
 
 #include <application.h>
 
-#include "NavData.h"
+#include "navdata.h"
 #include "Telemetry.h"
 #include "TelemetryTransport.h"
 
@@ -17,9 +17,8 @@ public:
     void sendTelemetry(Telemetry *telemetry);
 
 private:
-    void writeHeader();
     void writeSequenceNumber();
-    void writeDemo();
+    void writeDemo(Telemetry *telemetry);
     void writeTime();
     void writeChecksum();
     void writeBuffer(void *buf, uint8_t size);

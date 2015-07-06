@@ -15,6 +15,7 @@ public:
 
     Vector3 acceleration;
     Vector3 rotation;
+    Vector3 orientation;
 
 private:
     TelemetryTransport *transport;

@@ -1,4 +1,4 @@
-#include "defines.h"
+#include "config.h"
 #include "Sensors.h"
 
 #ifdef AK8975_INSTALLED
@@ -45,7 +45,7 @@ Accelerometer *Sensors::getAccelerometer() {
     #if ACCELEROMETER_TYPE == MPU6050
     return &HAL_MPU6050::getInstance();
     #else
-    #error No accelerometer configured! Make sure to set ACCELEROMETER_TYPE in defines.h
+    #error No accelerometer configured! Make sure to set ACCELEROMETER_TYPE in config.h
     #endif
 }
 
@@ -53,7 +53,7 @@ Barometer *Sensors::getBarometer() {
     #if BAROMETER_TYPE == BMP085
     return &HAL_BMP085::getInstance();
     #else
-    #warning No barometer configured! Make sure to set BAROMETER_TYPE in defines.h
+    #warning No barometer configured! Make sure to set BAROMETER_TYPE in config.h
     return NULL;
     #endif
 }
@@ -64,7 +64,7 @@ Compass *Sensors::getCompass() {
     #elif COMPASS_TYPE == AK8975
     return &HAL_AK8975::getInstance();
     #else
-    #warning No compass configured! Make sure to set COMPASS_TYPE in defines.h
+    #warning No compass configured! Make sure to set COMPASS_TYPE in config.h
     return NULL;
     #endif
 }
@@ -73,7 +73,7 @@ Gyroscope *Sensors::getGyroscope() {
     #if GYROSCOPE_TYPE == MPU6050
     return &HAL_MPU6050::getInstance();
     #else
-    #error No gyroscope configured! Make sure to set GYROSCOPE_TYPE in defines.h
+    #error No gyroscope configured! Make sure to set GYROSCOPE_TYPE in config.h
     #endif
 }
 

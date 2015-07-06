@@ -7,9 +7,8 @@ NavdataTelemetryTransport::NavdataTelemetryTransport() {
 void NavdataTelemetryTransport::sendTelemetry(Telemetry *telemetry) {
     // Check if we got a navdata "wake-up" packet from a client
     if(udp.parsePacket()) {
-        Serial.println("SOMEONE CONNECTED ON UDP");
-
         // Flush the "wake-up" packet through
+        // NOTE: Always read/flush UDP packets before writing back
         while(udp.available()) udp.read();
         udp.flush();
 
@@ -21,44 +20,42 @@ void NavdataTelemetryTransport::sendTelemetry(Telemetry *telemetry) {
         clientConnected = true;
     }
 
-    // Send telemetry if necessary
-    if(clientConnected && lastFlush + NAVDATA_FLUSH_FREQUENCY < millis()) {
-        // Start the navdata payload
-        udp.beginPacket(ipAddress, port);
+    if(clientConnected) {
+        // Send telemetry if necessary
+        if(lastFlush + NAVDATA_FLUSH_FREQUENCY < millis()) {
+            // Start the navdata payload
+            udp.beginPacket(ipAddress, port);
 
-        // Write the header (32-bit)
-        writeHeader();
+            // Write the header (32-bit)
+            writeLongWord(NAVDATA_HEADER);
 
-        // Write the drone state (32-bit bit mask)
-        writeLongWord(0); // TODO
+            // Write the drone state (32-bit bit mask)
+            writeLongWord(0); // TODO
 
-        // Write the sequence number
-        writeSequenceNumber();
+            // Write the sequence number
+            writeSequenceNumber();
 
-        // Write the vision flag (not used)
-        writeLongWord(0);
+            // Write the vision flag (not used)
+            writeLongWord(0);
 
-        // Write some options data
-        writeDemo();
-        writeTime();
+            // Write some options data
+            writeDemo(telemetry);
+            writeTime();
 
-        // Write the checksum
-        writeChecksum();
+            // Write the checksum
+            writeChecksum();
 
-        // Write the buffer
-        flush();
+            // Write the buffer
+            flush();
+        }
     }
-}
-
-void NavdataTelemetryTransport::writeHeader() {
-    writeLongWord(NAVDATA_HEADER);
 }
 
 void NavdataTelemetryTransport::writeSequenceNumber() {
     writeLongWord(sequenceNumber);
 }
 
-void NavdataTelemetryTransport::writeDemo() {
+void NavdataTelemetryTransport::writeDemo(Telemetry *telemetry) {
     navdata_demo_t payload;
 
     memset(&payload, 0, sizeof(navdata_demo_t));
@@ -66,9 +63,9 @@ void NavdataTelemetryTransport::writeDemo() {
     payload.tag = NAVDATA_DEMO_TAG;
     payload.size = sizeof(navdata_demo_t);
 
-    payload.theta = 45*1000.0;//orientation.y * 1000.0;
-    payload.phi = 45*1000.0;//orientation.x * 1000.0;
-    payload.psi = 45*1000.0;//orientation.z * 1000.0;
+    payload.theta = telemetry->orientation.y * 1000.0;
+    payload.phi = telemetry->orientation.x * 1000.0;
+    payload.psi = telemetry->orientation.z * 1000.0;
 
     // TODO: Anything else
 
@@ -102,13 +99,13 @@ void NavdataTelemetryTransport::writeChecksum() {
     writeBuffer(&payload, sizeof(navdata_cks_t));
 }
 
+void NavdataTelemetryTransport::writeLongWord(int32_t longWord) {
+    writeBuffer(&longWord, sizeof(int32_t));
+}
+
 void NavdataTelemetryTransport::writeBuffer(void *buf, uint8_t size) {
     memcpy(buffer + bufferSize, buf, size);
     bufferSize += size;
-}
-
-void NavdataTelemetryTransport::writeLongWord(int32_t longWord) {
-    writeBuffer(&longWord, sizeof(int32_t));
 }
 
 void NavdataTelemetryTransport::flush() {

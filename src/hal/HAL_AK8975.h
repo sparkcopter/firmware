@@ -1,6 +1,6 @@
 #pragma once
 
-#include "defines.h"
+#include "config.h"
 
 #ifdef AK8975_INSTALLED
 

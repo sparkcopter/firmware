@@ -18,4 +18,14 @@ void SerialTelemetryTransport::sendTelemetry(Telemetry *telemetry) {
     Serial.print(", ");
     Serial.print(telemetry->rotation.z);
     Serial.println();
+
+    Serial.print("Orientation: ");
+    Serial.print(telemetry->orientation.x);
+    Serial.print(", ");
+    Serial.print(telemetry->orientation.y);
+    Serial.print(", ");
+    Serial.print(telemetry->orientation.z);
+    Serial.println();
+
+    Serial.println();
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "defines.h"
+#include "config.h"
 
 #ifdef HMC5883L_INSTALLED
 

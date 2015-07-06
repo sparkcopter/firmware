@@ -1,8 +1,7 @@
 #pragma once
+#pragma pack(1)
 
 #include <application.h>
-
-#define _ATTRIBUTE_PACKED_  __attribute__ ((packed))
 
 enum NavDataTag {
     NAVDATA_DEMO_TAG = 0,
@@ -47,7 +46,7 @@ typedef struct {
     float   vz;                      // Estimated linear z-axis speed
 
     int32_t unused[27];
-}_ATTRIBUTE_PACKED_ navdata_demo_t;
+} navdata_demo_t;
 
 // Time option
 typedef struct {
@@ -55,7 +54,7 @@ typedef struct {
     uint16_t  size;
 
     uint32_t  time;                  // 11 MSB = seconds, 21 LSB = microseconds
-}_ATTRIBUTE_PACKED_ navdata_time_t;
+} navdata_time_t;
 
 // Checksum option
 typedef struct {
@@ -63,4 +62,6 @@ typedef struct {
     uint16_t  size;
 
     uint32_t  cks;                   // Integer sum of all bytes in buffer
-}_ATTRIBUTE_PACKED_ navdata_cks_t;
+} navdata_cks_t;
+
+#pragma pack()

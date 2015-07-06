@@ -8,10 +8,8 @@
 
 #include "IMU.h"
 #include "MPU6050.h"
-#include "SerialTelemetryTransport.h"
+#include "NavdataTelemetryTransport.h"
 #include "Telemetry.h"
-
-SYSTEM_MODE(AUTOMATIC);
 
 IMU imu;
 Telemetry *telemetry;
@@ -25,7 +23,9 @@ void setup() {
     imu.initialize();
 
     telemetry = Telemetry::getInstance();
-    telemetry->setTransport(new SerialTelemetryTransport());
+    telemetry->setTransport(new NavdataTelemetryTransport());
+
+    Spark.disconnect();
 }
 
 void loop() {

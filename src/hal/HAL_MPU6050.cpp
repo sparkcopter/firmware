@@ -1,4 +1,4 @@
-#include "defines.h"
+#include "config.h"
 
 #ifdef MPU6050_INSTALLED
 
