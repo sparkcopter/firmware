@@ -13,21 +13,20 @@
 #include "Telemetry.h"
 
 IMU imu;
-Telemetry *telemetry;
+Telemetry *telemetry = Telemetry::getInstance();
 
 void setup() {
+    // Disconnect from the Spark cloud, to avoid pauses
     Spark.disconnect();
 
-    Serial.begin(115200);
-
+    // Activate high-speed i2c
     Wire.setSpeed(CLOCK_SPEED_400KHZ);
     Wire.begin();
 
     imu.initialize();
 
-    telemetry = Telemetry::getInstance();
-    telemetry->setTransport(new SerialTelemetryTransport());
-    // telemetry->setTransport(new NavdataTelemetryTransport());
+    telemetry->addTransport(new SerialTelemetryTransport());
+    telemetry->addTransport(new NavdataTelemetryTransport());
 
     RGB.control(true);
     RGB.color(255, 165, 0);

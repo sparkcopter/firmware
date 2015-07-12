@@ -3,6 +3,8 @@
 #include "TelemetryTransport.h"
 #include "Vector3.h"
 
+#define TELEMETRY_MAX_TRANSPORTS 2
+
 class Telemetry {
 public:
     static Telemetry* getInstance() {
@@ -10,7 +12,7 @@ public:
         return &instance;
     }
 
-    void setTransport(TelemetryTransport *transport);
+    void addTransport(TelemetryTransport *transport);
     void send();
 
     Vector3 acceleration;
@@ -19,5 +21,6 @@ public:
     Vector3 orientation;
 
 private:
-    TelemetryTransport *transport;
+    TelemetryTransport *transports[TELEMETRY_MAX_TRANSPORTS];
+    int numTransports = 0;
 };

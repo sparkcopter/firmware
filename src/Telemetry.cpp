@@ -1,9 +1,11 @@
 #include "Telemetry.h"
 
-void Telemetry::setTransport(TelemetryTransport *transport) {
-    this->transport = transport;
+void Telemetry::addTransport(TelemetryTransport *transport) {
+    this->transports[numTransports++] = transport;
 }
 
 void Telemetry::send() {
-  transport->sendTelemetry(this);
+    for(int i=0; i<numTransports; i++) {
+        transports[i]->sendTelemetry(this);
+    }
 }

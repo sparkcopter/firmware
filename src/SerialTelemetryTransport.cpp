@@ -3,6 +3,10 @@
 #include "Sensors.h"
 #include "SerialTelemetryTransport.h"
 
+SerialTelemetryTransport::SerialTelemetryTransport() {
+    Serial.begin(115200);
+}
+
 void SerialTelemetryTransport::sendTelemetry(Telemetry *telemetry) {
     Serial.print("Acceleration: ");
     Serial.print(telemetry->acceleration.x);
