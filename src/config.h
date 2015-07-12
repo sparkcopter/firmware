@@ -1,54 +1,22 @@
 #pragma once
 
 //
-// Which sensor devices are installed?
+// Configure which sensor devices are installed
 //
 
-// The AK8963 is API compatible with the AK8975
+// MPU6050/MPU6500 - Accelerometer/Gyroscope
+#define MPU6050_INSTALLED
+#define MPU6050_ORIENTATION(X,Y,Z) X,Y,-Z
+
+// AK8963/AK8975 - Compass
 // #define AK8975_INSTALLED
 
-// The BMP180 is API compatible with with BMP085
-#define BMP085_INSTALLED
+// BMP085/BMP180 - Barometer
+// #define BMP085_INSTALLED
 
-// HMC5883L compass
-#define HMC5883L_INSTALLED
+// HMC5883L - Compass
+// #define HMC5883L_INSTALLED
 
-// The MPU6500 is API compatible with the MPU6050
-#define MPU6050_INSTALLED
-
-// The MPU9150 contains both a MPU6050 and AK8975 sensor
-// #define MPU9150_INSTALLED
-
-// The MPU9150 contains both a MPU6050 and AK8975 sensor
-// #define MPU9250_INSTALLED
-
-
-//
-// Which devices should we use for each sensor type?
-//
-
-#ifdef AK8975_INSTALLED
-#define COMPASS_TYPE AK8975
-#endif
-
-#ifdef BMP085_INSTALLED
-#define BAROMETER_TYPE BMP085
-#endif
-
-#ifdef HMC5883L_INSTALLED
-#define COMPASS_TYPE HMC5883L
-#endif
-
-#ifdef MPU6050_INSTALLED
-#define ACCELEROMETER_TYPE MPU6050
-#endif
-
-#ifdef MPU9150_INSTALLED
-#define ACCELEROMETER_TYPE MPU6050
-#define COMPASS_TYPE AK8975
-#endif
-
-#ifdef MPU9250_INSTALLED
-#define ACCELEROMETER_TYPE MPU6050
-#define COMPASS_TYPE AK8975
-#endif
+// MPU9150/MPU9250 - Accelerometer/Gyroscope/Compass
+// #define MPU6050_INSTALLED
+// #define AK8975_INSTALLED

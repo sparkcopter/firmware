@@ -42,53 +42,45 @@ void Sensors::groundCalibrate() {
 }
 
 Accelerometer *Sensors::getAccelerometer() {
-    #if ACCELEROMETER_TYPE == MPU6050
+    #ifdef MPU6050_INSTALLED
     return &HAL_MPU6050::getInstance();
     #else
-    #error No accelerometer configured! Make sure to set ACCELEROMETER_TYPE in config.h
+    #error No accelerometer configured! Make sure to set one in config.h
     #endif
 }
 
 Barometer *Sensors::getBarometer() {
-    #if BAROMETER_TYPE == BMP085
+    #ifdef BMP085_INSTALLED
     return &HAL_BMP085::getInstance();
     #else
-    #warning No barometer configured! Make sure to set BAROMETER_TYPE in config.h
+    #warning No barometer configured! Make sure to set one in config.h
     return NULL;
     #endif
 }
 
 Compass *Sensors::getCompass() {
-    #if COMPASS_TYPE == HMC5883L
+    #if defined HMC5883L_INSTALLED
     return &HAL_HMC5883L::getInstance();
-    #elif COMPASS_TYPE == AK8975
+    #elif defined AK8975_INSTALLED
     return &HAL_AK8975::getInstance();
     #else
-    #warning No compass configured! Make sure to set COMPASS_TYPE in config.h
+    #warning No compass configured! Make sure to set one in config.h
     return NULL;
     #endif
 }
 
 Gyroscope *Sensors::getGyroscope() {
-    #if GYROSCOPE_TYPE == MPU6050
+    #ifdef MPU6050_INSTALLED
     return &HAL_MPU6050::getInstance();
     #else
-    #error No gyroscope configured! Make sure to set GYROSCOPE_TYPE in config.h
+    #error No gyroscope configured! Make sure to set one in config.h
     #endif
 }
 
 bool Sensors::barometerAvailable() {
-    #ifdef BAROMETER_TYPE
-    return true;
-    #else
-    return false;
-    #endif
+    return getBarometer() != NULL;
 }
 
 bool Sensors::compassAvailable() {
-    #ifdef COMPASS_TYPE
-    return true;
-    #else
-    return false;
-    #endif
+    return getCompass() != NULL;
 }
