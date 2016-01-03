@@ -95,7 +95,7 @@ Vector3 HAL_MPU6050::getAcceleration() {
     device.getAcceleration(&rax, &ray, &raz);
 
     // Convert raw accelerometer readings into Gs
-    return Vector3(MPU6050_ORIENTATION((double)rax/accelScale, (double)ray/accelScale, (double)raz/accelScale));
+    return Vector3(ACCELEROMETER_ORIENTATION((double)rax/accelScale, (double)ray/accelScale, (double)raz/accelScale));
 }
 
 Vector3 HAL_MPU6050::getRotation() {
@@ -104,7 +104,7 @@ Vector3 HAL_MPU6050::getRotation() {
     device.getRotation(&rgx, &rgy, &rgz);
 
     // Convert raw gyroscope readings into degrees per second
-    return Vector3(MPU6050_ORIENTATION((double)rgx/gyroScale, (double)rgy/gyroScale, (double)rgz/gyroScale));
+    return Vector3(GYROSCOPE_ORIENTATION((double)rgx/gyroScale, (double)rgy/gyroScale, (double)rgz/gyroScale));
 }
 
 #endif // MPU6050_INSTALLED

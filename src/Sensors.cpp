@@ -1,6 +1,10 @@
 #include "config.h"
 #include "Sensors.h"
 
+#ifdef AK8963_INSTALLED
+#include "HAL_AK8963.h"
+#endif
+
 #ifdef AK8975_INSTALLED
 #include "HAL_AK8975.h"
 #endif
@@ -18,6 +22,10 @@
 #endif
 
 void Sensors::initialize() {
+    #ifdef AK8963_INSTALLED
+    HAL_AK8963::getInstance().initialize();
+    #endif
+
     #ifdef AK8975_INSTALLED
     HAL_AK8975::getInstance().initialize();
     #endif
@@ -59,10 +67,12 @@ Barometer *Sensors::getBarometer() {
 }
 
 Compass *Sensors::getCompass() {
-    #if defined HMC5883L_INSTALLED
-    return &HAL_HMC5883L::getInstance();
+    #if defined AK8963_INSTALLED
+    return &HAL_AK8963::getInstance();
     #elif defined AK8975_INSTALLED
     return &HAL_AK8975::getInstance();
+    #elif defined HMC5883L_INSTALLED
+    return &HAL_HMC5883L::getInstance();
     #else
     #warning No compass configured! Make sure to set one in config.h
     return NULL;
