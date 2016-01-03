@@ -6,7 +6,6 @@
 
 #define CF_GYRO_WEIGHT      0.90
 #define CF_ACCEL_WEIGHT     (1 - CF_GYRO_WEIGHT)
-#define MICROS_ROLLOVER ((unsigned long)59652323)
 
 IMU::IMU() {
 
@@ -24,11 +23,8 @@ void IMU::update() {
     Telemetry *telemetry = Telemetry::getInstance();
 
     // Get the time since last update
-    // NOTE: Spark's micros() function rolls over every ~59 seconds due to a bug!
-    // https://community.spark.io/t/micros-rolling-over-after-59-652323-seconds-not-71-minutes-solved
     unsigned long now = micros();
     unsigned long delta = now - lastUpdate;
-    if((long)delta < 0) delta += MICROS_ROLLOVER;
     lastUpdate = now;
     double dt = (double)delta / 1000000.0;
 
@@ -58,9 +54,7 @@ void IMU::update() {
 
         // Convert to scalar compass heading
         double magneticHeading = atan2(heading.y, heading.x) * 180/M_PI;
-        if(magneticHeading < 0) {
-            magneticHeading += 360.0;
-        }
+        // TODO: Clamp to range (0<->360 or -180<->180)
 
         orientation.z = magneticHeading;
 
