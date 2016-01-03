@@ -50,8 +50,6 @@ Our hardware contains an MPU-6050 chip, which has an on-board gyroscope and acce
 
 Raw I2C access is possible using Spark's [Wire](http://docs.spark.io/firmware/#communication-wire) library, but for easier access we'll use Jeff Rowberg's excellent [i2cdevlib](https://github.com/jrowberg/i2cdevlib) library which includes some [convenient wrapper functions](https://github.com/jrowberg/i2cdevlib/tree/master/Arduino/MPU6050) for accessing sensor data from our MPU-6050.
 
-> Note: The i2cdevlib library doesn't yet support the Spark Core out of the box, so check out my [my pull request](https://github.com/jrowberg/i2cdevlib/pull/156) which adds support.
-
 Raw sensor values can then easily be read as follows:
 
 ```c++
