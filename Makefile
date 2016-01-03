@@ -1,13 +1,14 @@
-FIRMWARE=sparkcopter.bin
+DEVICE_TYPE ?= photon
+FIRMWARE = sparkcopter-$(DEVICE_TYPE).bin
 
 .PHONY: clean
 
 all: $(FIRMWARE)
 
 $(FIRMWARE):
-	particle compile . --saveTo $(FIRMWARE) --deviceType $(DEVICE_TYPE)
+	particle compile $(DEVICE_TYPE) . --saveTo $(FIRMWARE)
 
-install: $(FIRMWARE)
+install: checkenv $(FIRMWARE)
 	particle flash $(DEVICE_NAME) $(FIRMWARE)
 
 install-usb: $(FIRMWARE)
@@ -15,3 +16,8 @@ install-usb: $(FIRMWARE)
 
 clean:
 	rm -f *.bin
+
+checkenv:
+ifndef DEVICE_NAME
+$(error DEVICE_NAME is not set)
+endif
