@@ -6,7 +6,7 @@
 
 // MPU6050/MPU6500 - Accelerometer/Gyroscope
 #define MPU6050_INSTALLED
-#define MPU6050_ORIENTATION(X,Y,Z) X,Y,-Z
+#define MPU6050_ORIENTATION(X,Y,Z) X,-Y,-Z
 
 // AK8963/AK8975 - Compass
 // #define AK8975_INSTALLED

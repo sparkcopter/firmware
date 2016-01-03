@@ -2,7 +2,7 @@
 
 #include <application.h>
 
-#include "navdata.h"
+#include "NavData.h"
 #include "Telemetry.h"
 #include "TelemetryTransport.h"
 
