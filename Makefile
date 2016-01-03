@@ -11,11 +11,14 @@ $(FIRMWARE):
 install: checkenv $(FIRMWARE)
 	particle flash $(DEVICE_NAME) $(FIRMWARE)
 
-install-usb: $(FIRMWARE)
+install-usb: $(FIRMWARE) enter-dfu-mode
 	particle flash --usb $(FIRMWARE)
 
 clean:
 	rm -f *.bin
+
+enter-dfu-mode:
+	-stty -f /dev/tty.usbmodem1411 14400
 
 checkenv:
 ifndef DEVICE_NAME
