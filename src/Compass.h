@@ -4,6 +4,6 @@
 
 class Compass {
 public:
-    // Get the current heading vector, in Guass
+    // Get the current heading vector, in milliGauss
     virtual Vector3 getHeading() = 0;
 };
