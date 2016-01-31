@@ -45,7 +45,7 @@ private:
     int derivativeSource = PID_DERIVATIVE_SOURCE_PV;
 
     // Time between samples (in milliseconds)
-    int sampleTime = 30;
+    unsigned int sampleTime = 30;
 
     // Output limits
     double outMin = 0, outMax = 255;

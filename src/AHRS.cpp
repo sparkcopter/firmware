@@ -1,21 +1,17 @@
 #include "application.h"
 
-#include "IMU.h"
+#include "AHRS.h"
 #include "Sensors.h"
 #include "Telemetry.h"
 
 #define CF_GYRO_WEIGHT      0.90
 #define CF_ACCEL_WEIGHT     (1 - CF_GYRO_WEIGHT)
 
-IMU::IMU() {
-
-}
-
-void IMU::initialize() {
+void AHRS::initialize() {
     Sensors::initialize();
 }
 
-void IMU::update() {
+void AHRS::update() {
     Telemetry *telemetry = Telemetry::getInstance();
 
     // Get the time since last update
@@ -39,13 +35,17 @@ void IMU::update() {
     double accelPitch = atan2(-acceleration.x, sqrt(acceleration.y * acceleration.y + acceleration.z * acceleration.z)) * 180.0 / M_PI;
 
     // Combine gyroscope and accelerometer data for roll and pitch
-    orientation.x = CF_GYRO_WEIGHT * (orientation.x + rotation.x * dt) + CF_ACCEL_WEIGHT * accelRoll;
-    orientation.y = CF_GYRO_WEIGHT * (orientation.y + rotation.y * dt) + CF_ACCEL_WEIGHT * accelPitch;
+    Vector3 newOrientation;
+    newOrientation.roll = CF_GYRO_WEIGHT * (orientation.roll + rotation.x * dt) + CF_ACCEL_WEIGHT * accelRoll;
+    newOrientation.pitch = CF_GYRO_WEIGHT * (orientation.pitch + rotation.y * dt) + CF_ACCEL_WEIGHT * accelPitch;
 
     // Calculate yaw using compass, fall back to gyroscope data
-    if(Sensors::getMagnetometer()) {
+    Magnetometer *magnetometer = Sensors::getMagnetometer();
+    if(magnetometer) {
         // Get compass heading
-        orientation.z = Sensors::getMagnetometer()->getAzimuth();
+        newOrientation.yaw = magnetometer->getAzimuth();
+
+        // TODO: Compensate heading for hard iron biases
 
         // TODO: Compensate heading for tilt
         // http://cache.freescale.com/files/sensors/doc/app_note/AN4248.pdf
@@ -53,16 +53,18 @@ void IMU::update() {
         // compensatedYaw = atan2(-heading.y * cos(orientation.x) + heading.z * sin(orientation.x), heading.x * cos(orientation.y) + heading.z * sin(orientation.y) * sin(orientation.x) + heading.z * sin(orientation.y) * cos(orientation.x)) *180/PI;
 
         // TODO: Convert from magnetic north to true north?
+        // TODO: Lookup declination from geo-ip?
         // http://www.magnetic-declination.com/
     } else {
         // Use gyroscope data for yaw, restrict range to -180 -> 180
-        orientation.z = remainder(orientation.z + rotation.z * dt, 360);
+        newOrientation.yaw = remainder(orientation.yaw + rotation.z * dt, 360);
     }
 
     // Update telemetry
+    orientation = newOrientation;
     telemetry->orientation = orientation;
 }
 
-Vector3 IMU::getOrientation() {
+Vector3 AHRS::getOrientation() {
     return orientation;
 }
