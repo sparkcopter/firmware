@@ -1,0 +1,3 @@
+[submodule "lib/i2c-sensor-hal"]
+	path = lib/i2c-sensor-hal
+	url = https://github.com/loopj/i2c-sensor-hal.git
