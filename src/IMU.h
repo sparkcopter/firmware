@@ -2,8 +2,8 @@
 
 #include "Accelerometer.h"
 #include "Barometer.h"
-#include "Compass.h"
 #include "Gyroscope.h"
+#include "Magnetometer.h"
 #include "Vector3.h"
 
 class IMU {
@@ -13,8 +13,7 @@ public:
     // Initialize sensors
     void initialize();
 
-    // Calibrate sensors on ground level
-    void groundCalibrate();
+    // TODO: Calibrate sensors on ground level
 
     // Update orientation and altitude from sensor data
     void update();

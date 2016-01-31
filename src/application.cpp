@@ -1,7 +1,6 @@
 #include "application.h"
 
 #include "IMU.h"
-#include "MPU6050.h"
 #include "NavdataTelemetryTransport.h"
 #include "SerialTelemetryTransport.h"
 #include "Telemetry.h"

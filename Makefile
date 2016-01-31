@@ -1,7 +1,8 @@
+BINARY_NAME = sparkcopter
 DEVICE_TYPE ?= photon
-FIRMWARE = sparkcopter-$(DEVICE_TYPE).bin
+FIRMWARE = $(BINARY_NAME)-$(DEVICE_TYPE).bin
 
-.PHONY: clean
+.PHONY: all install install-usb clean checkenv enter-dfu-mode
 
 all: $(FIRMWARE)
 
@@ -22,5 +23,5 @@ enter-dfu-mode:
 
 checkenv:
 ifndef DEVICE_NAME
-$(error DEVICE_NAME is not set)
+	$(error DEVICE_NAME is not set)
 endif

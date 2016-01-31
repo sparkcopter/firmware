@@ -1,4 +1,4 @@
-**/*.h
-**/*.ino
-**/*.cpp
-**/*.c
+lib/i2c-sensor-hal/src/**/*.h
+lib/i2c-sensor-hal/src/**/*.cpp
+src/**/*.h
+src/**/*.cpp

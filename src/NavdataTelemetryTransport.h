@@ -34,5 +34,5 @@ private:
 
     uint8_t bufferSize = 0;
     uint8_t buffer[1024];
-    int lastFlush = 0;
+    unsigned long lastFlush = 0;
 };

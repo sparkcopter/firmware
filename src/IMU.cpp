@@ -15,10 +15,6 @@ void IMU::initialize() {
     Sensors::initialize();
 }
 
-void IMU::groundCalibrate() {
-    Sensors::groundCalibrate();
-}
-
 void IMU::update() {
     Telemetry *telemetry = Telemetry::getInstance();
 
@@ -39,24 +35,17 @@ void IMU::update() {
     // Get accelerometer orientation
     // See "Tilt Sensing Using a Three-Axis Accelerometer" eqns 37 and 38
     // http://cache.freescale.com/files/sensors/doc/app_note/AN3461.pdf
-    double accelRoll = atan2(acceleration.y, copysign(sqrt(acceleration.z * acceleration.z + 0.01 * acceleration.x * acceleration.x), acceleration.z)) * RAD_TO_DEG;
-    double accelPitch = atan2(-acceleration.x, sqrt(acceleration.y * acceleration.y + acceleration.z * acceleration.z)) * RAD_TO_DEG;
+    double accelRoll = atan2(acceleration.y, copysign(sqrt(acceleration.z * acceleration.z + 0.01 * acceleration.x * acceleration.x), acceleration.z)) * 180.0 / M_PI;
+    double accelPitch = atan2(-acceleration.x, sqrt(acceleration.y * acceleration.y + acceleration.z * acceleration.z)) * 180.0 / M_PI;
 
     // Combine gyroscope and accelerometer data for roll and pitch
     orientation.x = CF_GYRO_WEIGHT * (orientation.x + rotation.x * dt) + CF_ACCEL_WEIGHT * accelRoll;
     orientation.y = CF_GYRO_WEIGHT * (orientation.y + rotation.y * dt) + CF_ACCEL_WEIGHT * accelPitch;
 
     // Calculate yaw using compass, fall back to gyroscope data
-    if(Sensors::compassAvailable()) {
-        // Get heading vector
-        Vector3 heading = Sensors::getCompass()->getHeading();
-        telemetry->heading = heading;
-
-        // Convert to scalar compass heading
-        double magneticHeading = atan2(heading.y, heading.x) * 180/M_PI;
-        // TODO: Clamp to range (0<->360 or -180<->180)
-
-        orientation.z = magneticHeading;
+    if(Sensors::getMagnetometer()) {
+        // Get compass heading
+        orientation.z = Sensors::getMagnetometer()->getAzimuth();
 
         // TODO: Compensate heading for tilt
         // http://cache.freescale.com/files/sensors/doc/app_note/AN4248.pdf
