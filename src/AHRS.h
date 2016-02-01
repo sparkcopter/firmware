@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Sensors.h"
 #include "Vector3.h"
 
 class AHRS {
@@ -14,6 +15,10 @@ public:
     Vector3 getOrientation();
 
 private:
+    Accelerometer *accelerometer;
+    Gyroscope *gyroscope;
+    Magnetometer *magnetometer;
+
     Vector3 orientation;
     unsigned long lastUpdate;
 };

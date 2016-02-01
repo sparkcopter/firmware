@@ -1,10 +1,10 @@
 #include "NavdataTelemetryTransport.h"
 
-NavdataTelemetryTransport::NavdataTelemetryTransport() {
+void NavdataTelemetryTransport::initialize() {
     udp.begin(NAVDATA_UDP_PORT);
 }
 
-void NavdataTelemetryTransport::sendTelemetry(Telemetry *telemetry) {
+void NavdataTelemetryTransport::send(Telemetry &telemetry) {
     // Check if we got a navdata "wake-up" packet from a client
     if(udp.parsePacket()) {
         // Flush the "wake-up" packet through
@@ -55,7 +55,7 @@ void NavdataTelemetryTransport::writeSequenceNumber() {
     writeLongWord(sequenceNumber);
 }
 
-void NavdataTelemetryTransport::writeDemo(Telemetry *telemetry) {
+void NavdataTelemetryTransport::writeDemo(Telemetry &telemetry) {
     navdata_demo_t payload;
 
     memset(&payload, 0, sizeof(navdata_demo_t));
@@ -63,9 +63,9 @@ void NavdataTelemetryTransport::writeDemo(Telemetry *telemetry) {
     payload.tag = NAVDATA_DEMO_TAG;
     payload.size = sizeof(navdata_demo_t);
 
-    payload.theta = telemetry->orientation.y * 1000.0;
-    payload.phi = telemetry->orientation.x * 1000.0;
-    payload.psi = telemetry->orientation.z * 1000.0;
+    payload.theta = telemetry.orientation.pitch * 1000.0;
+    payload.phi = telemetry.orientation.roll * 1000.0;
+    payload.psi = telemetry.orientation.yaw * 1000.0;
 
     // TODO: Anything else
 

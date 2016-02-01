@@ -1,7 +1,6 @@
-#include "application.h"
+#include <application.h>
 
 #include "AHRS.h"
-#include "Sensors.h"
 #include "Telemetry.h"
 
 #define CF_GYRO_WEIGHT      0.90
@@ -9,24 +8,32 @@
 
 void AHRS::initialize() {
     Sensors::initialize();
+
+    accelerometer = Sensors::getAccelerometer();
+    gyroscope = Sensors::getGyroscope();
+    magnetometer = Sensors::getMagnetometer();
 }
 
 void AHRS::update() {
-    Telemetry *telemetry = Telemetry::getInstance();
+    if(!accelerometer || !gyroscope) {
+      Serial.println("Couldn't update AHRS, the required devies were not connected");
+      return;
+    }
 
     // Get the time since last update
     unsigned long now = micros();
     unsigned long delta = now - lastUpdate;
     lastUpdate = now;
-    double dt = (double)delta / 1000000.0;
+    float dt = (float)delta / 1000000.0;
 
     // Get sensor data
-    Vector3 acceleration = Sensors::getAccelerometer()->getAcceleration();
-    Vector3 rotation = Sensors::getGyroscope()->getRotation();
+    Vector3 acceleration = accelerometer->getAcceleration();
+    Vector3 rotation = gyroscope->getRotation();
 
     // Update telemetry
-    telemetry->acceleration = acceleration;
-    telemetry->rotation = rotation;
+    Telemetry &telemetry = Telemetry::getInstance();
+    telemetry.acceleration = acceleration;
+    telemetry.rotation = rotation;
 
     // Get accelerometer orientation
     // See "Tilt Sensing Using a Three-Axis Accelerometer" eqns 37 and 38
@@ -35,15 +42,13 @@ void AHRS::update() {
     double accelPitch = atan2(-acceleration.x, sqrt(acceleration.y * acceleration.y + acceleration.z * acceleration.z)) * 180.0 / M_PI;
 
     // Combine gyroscope and accelerometer data for roll and pitch
-    Vector3 newOrientation;
-    newOrientation.roll = CF_GYRO_WEIGHT * (orientation.roll + rotation.x * dt) + CF_ACCEL_WEIGHT * accelRoll;
-    newOrientation.pitch = CF_GYRO_WEIGHT * (orientation.pitch + rotation.y * dt) + CF_ACCEL_WEIGHT * accelPitch;
+    orientation.roll = CF_GYRO_WEIGHT * (orientation.roll + rotation.x * dt) + CF_ACCEL_WEIGHT * accelRoll;
+    orientation.pitch = CF_GYRO_WEIGHT * (orientation.pitch + rotation.y * dt) + CF_ACCEL_WEIGHT * accelPitch;
 
     // Calculate yaw using compass, fall back to gyroscope data
-    Magnetometer *magnetometer = Sensors::getMagnetometer();
     if(magnetometer) {
         // Get compass heading
-        newOrientation.yaw = magnetometer->getAzimuth();
+        orientation.yaw = magnetometer->getAzimuth();
 
         // TODO: Compensate heading for hard iron biases
 
@@ -56,13 +61,17 @@ void AHRS::update() {
         // TODO: Lookup declination from geo-ip?
         // http://www.magnetic-declination.com/
     } else {
-        // Use gyroscope data for yaw, restrict range to -180 -> 180
-        newOrientation.yaw = remainder(orientation.yaw + rotation.z * dt, 360);
+        // Use gyroscope data for yaw
+        float gyroYaw = orientation.yaw + rotation.z * 180.0 / M_PI * dt;
+
+        // Restrict yaw to range of 0-360
+        if(gyroYaw < 0)      gyroYaw += 360;
+        if(gyroYaw > 360)    gyroYaw -= 360;
+
+        orientation.yaw = gyroYaw;
     }
 
-    // Update telemetry
-    orientation = newOrientation;
-    telemetry->orientation = orientation;
+    telemetry.orientation = orientation;
 }
 
 Vector3 AHRS::getOrientation() {

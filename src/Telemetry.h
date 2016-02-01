@@ -4,13 +4,17 @@
 
 class Telemetry {
 public:
-    static Telemetry *getInstance() {
+    static Telemetry &getInstance() {
         static Telemetry instance;
-        return &instance;
+        return instance;
     }
 
     Vector3 acceleration;
     Vector3 rotation;
-    Vector3 magneticField;
     Vector3 orientation;
+
+private:
+    Telemetry() {};
+    Telemetry(Telemetry const&){};
+    Telemetry& operator=(Telemetry const&);
 };

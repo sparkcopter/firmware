@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Telemetry.h"
+
 class TelemetryTransport {
 public:
-    virtual void sendTelemetry(Telemetry *telemetry) = 0;
+    virtual void send(Telemetry &telemetry) = 0;
 };

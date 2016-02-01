@@ -1,31 +1,39 @@
-#include "application.h"
+#include <application.h>
 
 #include "AHRS.h"
+#include "NavdataTelemetryTransport.h"
 #include "SerialTelemetryTransport.h"
 #include "Telemetry.h"
 
+// AHRS
 AHRS ahrs;
 
-Telemetry *telemetry = Telemetry::getInstance();
-SerialTelemetryTransport serialTransport;
+// Telemetry transports
+SerialTelemetryTransport serialTelemetry;
+NavdataTelemetryTransport navdataTelemetry;
 
 void setup() {
-    // Disconnect from the Particle cloud, to avoid pauses
-    Particle.disconnect();
-
     // Activate serial port (for debug printing)
     Serial.begin(115200);
 
-    // Activate high-speed i2c
+    // Activate i2c bus
     Wire.setSpeed(CLOCK_SPEED_400KHZ);
     Wire.begin();
 
     // Initialize the AHRS
     ahrs.initialize();
 
-    // Set the LED to yellow
-    RGB.control(true);
-    RGB.color(255, 165, 0);
+    // Boot countdown
+    for(int i=5; i>0; i--) {
+      Serial.print(i);
+      Serial.print("...");
+      delay(1000);
+    }
+    Serial.println();
+
+    navdataTelemetry.initialize();
+
+    Serial.println(WiFi.localIP());
 }
 
 void loop() {
@@ -36,5 +44,7 @@ void loop() {
     Vector3 orientation = ahrs.getOrientation();
 
     // Send telemetry information
-    serialTransport.sendTelemetry(telemetry);
+    Telemetry &telemetry = Telemetry::getInstance();
+    serialTelemetry.send(telemetry);
+    navdataTelemetry.send(telemetry);
 }
